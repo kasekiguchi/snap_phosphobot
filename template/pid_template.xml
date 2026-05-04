@@ -78,6 +78,50 @@ return JSON.stringify((JSON.parse(xhr.responseText||"{}").angles)||[]);
       </block>
     </script>
   </block-definition>
+  <block-definition s="statusを読む" type="reporter" category="phosphobot">
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs />
+    <script>
+      <block s="doReport">
+        <block s="evaluate">
+          <block s="reportJSFunction">
+            <list />
+            <l>
+function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8020").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8020").replace(/\/$/,"");}}
+var xhr=new XMLHttpRequest();xhr.open("GET",base(this)+"/status",false);xhr.send();
+if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/status HTTP "+xhr.status+": "+xhr.responseText);}
+try{this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} return xhr.responseText||"{}";
+    </l>
+          </block>
+          <list />
+        </block>
+      </block>
+    </script>
+  </block-definition>
+  <block-definition s="ロボット台数" type="reporter" category="phosphobot">
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs />
+    <script>
+      <block s="doReport">
+        <block s="evaluate">
+          <block s="reportJSFunction">
+            <list />
+            <l>
+function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8020").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8020").replace(/\/$/,"");}}
+var xhr=new XMLHttpRequest();xhr.open("GET",base(this)+"/status",false);xhr.send();
+if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/status HTTP "+xhr.status+": "+xhr.responseText);}
+var data=JSON.parse(xhr.responseText||"{}");try{this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} return data.robot_status?data.robot_status.length:((data.robots||[]).length);
+    </l>
+          </block>
+          <list />
+        </block>
+      </block>
+    </script>
+  </block-definition>
   <block-definition s="目標角度にうごかす 関節 %&apos;joint&apos; 角度 %&apos;angle&apos;" type="command" category="phosphobot">
     <header></header>
     <code></code>

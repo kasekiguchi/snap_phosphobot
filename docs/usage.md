@@ -13,6 +13,8 @@ If Snap! reports a CORS error, run `proxy/cors_proxy.py` on the Pi5 and set the 
 
 - `関節角度を読む 関節番号 [1]`: returns the selected joint angle in degrees.
 - `全関節角度を読む`: returns a JSON array string of all joint angles in degrees.
+- `statusを読む`: returns the raw `/status` JSON string.
+- `ロボット台数`: returns the number of robots reported by `/status`.
 - `目標角度にうごかす 関節 [1] 角度 [0]`: writes one joint target angle in degrees.
 - `ゲインを設定する P [1] I [0] D [0]`: stores PID gains in Snap!/browser variables.
 - `PID出力を計算する 目標 [0] 現在 [0] dt秒 [0.1]`: returns one PID control output and updates `pid_error`, `pid_integral`, `pid_derivative`.
