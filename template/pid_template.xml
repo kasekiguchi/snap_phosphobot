@@ -1,0 +1,251 @@
+<blocks app="Snap! 10, https://snap.berkeley.edu" version="2">
+  <palette>
+    <category name="phosphobot" color="46,128,92,1" />
+  </palette>
+  <block-definition s="phosphobot URLを %&apos;url&apos; にする" type="command" category="phosphobot">
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs>
+      <input type="%s">http://192.168.100.103:8020</input>
+    </inputs>
+    <script>
+      <block s="doRun">
+        <block s="reportJSFunction">
+          <list>
+            <l>url</l>
+          </list>
+          <l>
+window.phosphobot_url = String(url).replace(/\/$/, "");
+try { this.variables.setVar("phosphobot_url", window.phosphobot_url); } catch (e) {}
+return "";
+        </l>
+        </block>
+        <list>
+          <block var="url" />
+        </list>
+      </block>
+    </script>
+  </block-definition>
+  <block-definition s="関節角度を読む 関節番号 %&apos;joint&apos;" type="reporter" category="phosphobot">
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs>
+      <input type="%n">1</input>
+    </inputs>
+    <script>
+      <block s="doReport">
+        <block s="evaluate">
+          <block s="reportJSFunction">
+            <list>
+              <l>joint</l>
+            </list>
+            <l>
+function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8020").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8020").replace(/\/$/,"");}}
+var id=Math.max(1,parseInt(joint,10)||1)-1,xhr=new XMLHttpRequest();
+xhr.open("POST",base(this)+"/joints/read",false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({joints_ids:[id],source:"robot",unit:"degrees"}));
+if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/joints/read HTTP "+xhr.status+": "+xhr.responseText);}
+var data=JSON.parse(xhr.responseText||"{}"),angle=data.angles?data.angles[0]:null;try{this.variables.setVar("current_angle",angle);}catch(e){} return angle;
+    </l>
+          </block>
+          <list>
+            <block var="joint" />
+          </list>
+        </block>
+      </block>
+    </script>
+  </block-definition>
+  <block-definition s="全関節角度を読む" type="reporter" category="phosphobot">
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs />
+    <script>
+      <block s="doReport">
+        <block s="evaluate">
+          <block s="reportJSFunction">
+            <list />
+            <l>
+function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8020").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8020").replace(/\/$/,"");}}
+var xhr=new XMLHttpRequest();xhr.open("POST",base(this)+"/joints/read",false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({source:"robot",unit:"degrees"}));
+if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/joints/read HTTP "+xhr.status+": "+xhr.responseText);}
+return JSON.stringify((JSON.parse(xhr.responseText||"{}").angles)||[]);
+    </l>
+          </block>
+          <list />
+        </block>
+      </block>
+    </script>
+  </block-definition>
+  <block-definition s="目標角度にうごかす 関節 %&apos;joint&apos; 角度 %&apos;angle&apos;" type="command" category="phosphobot">
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs>
+      <input type="%n">1</input>
+      <input type="%n">0</input>
+    </inputs>
+    <script>
+      <block s="doRun">
+        <block s="reportJSFunction">
+          <list>
+            <l>joint</l>
+            <l>angle</l>
+          </list>
+          <l>
+function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8020").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8020").replace(/\/$/,"");}}
+var id=Math.max(1,parseInt(joint,10)||1)-1,target=Number(angle),xhr=new XMLHttpRequest();
+xhr.open("POST",base(this)+"/joints/write",false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({joints_ids:[id],angles:[target],unit:"degrees"}));
+if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/joints/write HTTP "+xhr.status+": "+xhr.responseText);}
+try{this.variables.setVar("target_angle",target);this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} return "";
+    </l>
+        </block>
+        <list>
+          <block var="joint" />
+          <block var="angle" />
+        </list>
+      </block>
+    </script>
+  </block-definition>
+  <block-definition s="ゲインを設定する P %&apos;p&apos; I %&apos;i&apos; D %&apos;d&apos;" type="command" category="phosphobot">
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs>
+      <input type="%n">1</input>
+      <input type="%n">0</input>
+      <input type="%n">0</input>
+    </inputs>
+    <script>
+      <block s="doRun">
+        <block s="reportJSFunction">
+          <list>
+            <l>p</l>
+            <l>i</l>
+            <l>d</l>
+          </list>
+          <l>
+window.pid_p=Number(p);window.pid_i=Number(i);window.pid_d=Number(d);window.pid_integral=0;window.pid_last_error=0;
+try{this.variables.setVar("pid_p",window.pid_p);this.variables.setVar("pid_i",window.pid_i);this.variables.setVar("pid_d",window.pid_d);this.variables.setVar("pid_integral",0);this.variables.setVar("pid_error",0);this.variables.setVar("pid_derivative",0);}catch(e){} return "";
+    </l>
+        </block>
+        <list>
+          <block var="p" />
+          <block var="i" />
+          <block var="d" />
+        </list>
+      </block>
+    </script>
+  </block-definition>
+  <block-definition s="PID出力を計算する 目標 %&apos;target&apos; 現在 %&apos;current&apos; dt秒 %&apos;dt&apos;" type="reporter" category="phosphobot">
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs>
+      <input type="%n">0</input>
+      <input type="%n">0</input>
+      <input type="%n">0.1</input>
+    </inputs>
+    <script>
+      <block s="doReport">
+        <block s="evaluate">
+          <block s="reportJSFunction">
+            <list>
+              <l>target</l>
+              <l>current</l>
+              <l>dt</l>
+            </list>
+            <l>
+function getNum(ctx,name,fallback){try{var v=ctx.variables.getVar(name);return Number(v==null||v===""?fallback:v);}catch(e){return Number(window[name]==null?fallback:window[name]);}}
+var p=getNum(this,"pid_p",1),i=getNum(this,"pid_i",0),d=getNum(this,"pid_d",0),step=Math.max(0.001,Number(dt)||0.1),error=Number(target)-Number(current);
+window.pid_integral=Number(window.pid_integral||0)+error*step;var derivative=(error-Number(window.pid_last_error||0))/step;window.pid_last_error=error;
+try{this.variables.setVar("pid_error",error);this.variables.setVar("pid_integral",window.pid_integral);this.variables.setVar("pid_derivative",derivative);}catch(e){} return p*error+i*window.pid_integral+d*derivative;
+    </l>
+          </block>
+          <list>
+            <block var="target" />
+            <block var="current" />
+            <block var="dt" />
+          </list>
+        </block>
+      </block>
+    </script>
+  </block-definition>
+  <block-definition s="PIDで関節 %&apos;joint&apos; を目標角度 %&apos;target&apos; へ一歩うごかす dt秒 %&apos;dt&apos;" type="command" category="phosphobot">
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs>
+      <input type="%n">1</input>
+      <input type="%n">0</input>
+      <input type="%n">0.1</input>
+    </inputs>
+    <script>
+      <block s="doRun">
+        <block s="reportJSFunction">
+          <list>
+            <l>joint</l>
+            <l>target</l>
+            <l>dt</l>
+          </list>
+          <l>
+function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8020").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8020").replace(/\/$/,"");}}
+function post(ctx,path,body){var xhr=new XMLHttpRequest();xhr.open("POST",base(ctx)+path,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify(body||{}));if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error(path+" HTTP "+xhr.status+": "+xhr.responseText);}return JSON.parse(xhr.responseText||"{}");}
+function getNum(ctx,name,fallback){try{var v=ctx.variables.getVar(name);return Number(v==null||v===""?fallback:v);}catch(e){return Number(window[name]==null?fallback:window[name]);}}
+var id=Math.max(1,parseInt(joint,10)||1)-1,read=post(this,"/joints/read",{joints_ids:[id],source:"robot",unit:"degrees"}),current=Number(read.angles?read.angles[0]:0);
+var step=Math.max(0.001,Number(dt)||0.1),error=Number(target)-current,p=getNum(this,"pid_p",1),i=getNum(this,"pid_i",0),d=getNum(this,"pid_d",0);
+window.pid_integral=Number(window.pid_integral||0)+error*step;var derivative=(error-Number(window.pid_last_error||0))/step;window.pid_last_error=error;
+var next=current+(p*error+i*window.pid_integral+d*derivative),result=post(this,"/joints/write",{joints_ids:[id],angles:[next],unit:"degrees"});
+try{this.variables.setVar("current_angle",current);this.variables.setVar("target_angle",Number(target));this.variables.setVar("pid_error",error);this.variables.setVar("pid_integral",window.pid_integral);this.variables.setVar("pid_derivative",derivative);this.variables.setVar("last_response",JSON.stringify(result));}catch(e){} return "";
+    </l>
+        </block>
+        <list>
+          <block var="joint" />
+          <block var="target" />
+          <block var="dt" />
+        </list>
+      </block>
+    </script>
+  </block-definition>
+  <block-definition s="ホームに戻る" type="command" category="phosphobot">
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs />
+    <script>
+      <block s="doRun">
+        <block s="reportJSFunction">
+          <list />
+          <l>
+function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8020").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8020").replace(/\/$/,"");}}
+var xhr=new XMLHttpRequest();xhr.open("POST",base(this)+"/move/init",false);xhr.setRequestHeader("Content-Type","application/json");xhr.send("{}");
+if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/move/init HTTP "+xhr.status+": "+xhr.responseText);}try{this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} return "";
+    </l>
+        </block>
+        <list />
+      </block>
+    </script>
+  </block-definition>
+  <block-definition s="止まれ" type="command" category="phosphobot">
+    <comment w="240" collapsed="false">現在角度を読み、同じ角度を書き戻す保持停止。ハードウェア非常停止ではありません。</comment>
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs />
+    <script>
+      <block s="doRun">
+        <block s="reportJSFunction">
+          <list />
+          <l>
+function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8020").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8020").replace(/\/$/,"");}}
+function post(ctx,path,body){var xhr=new XMLHttpRequest();xhr.open("POST",base(ctx)+path,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify(body||{}));if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error(path+" HTTP "+xhr.status+": "+xhr.responseText);}return JSON.parse(xhr.responseText||"{}");}
+var read=post(this,"/joints/read",{source:"robot",unit:"degrees"}),result=post(this,"/joints/write",{angles:read.angles||[],unit:"degrees"});
+try{this.variables.setVar("last_response",JSON.stringify(result));}catch(e){} return "";
+    </l>
+        </block>
+        <list />
+      </block>
+    </script>
+  </block-definition>
+</blocks>
