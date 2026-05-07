@@ -330,4 +330,135 @@ try{this.variables.setVar("last_response",JSON.stringify(result));}catch(e){} re
       </block>
     </script>
   </block-definition>
+  <block-definition s="手先の位置を読む ロボット %&apos;robot&apos;" type="reporter" category="phosphobot">
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs>
+      <input type="%n">1</input>
+    </inputs>
+    <script>
+      <block s="doReport">
+        <block s="evaluate">
+          <block s="reportJSFunction">
+            <list>
+              <l>robot</l>
+            </list>
+            <l>
+function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+var rid=Math.max(1,parseInt(robot,10)||1)-1,xhr=new XMLHttpRequest();
+xhr.open("POST",base(this)+"/end-effector/read?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send("{}");
+if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/end-effector/read HTTP "+xhr.status+": "+xhr.responseText);}
+var data=JSON.parse(xhr.responseText||"{}");try{this.variables.setVar("last_response",JSON.stringify(data));}catch(e){} return JSON.stringify(data);
+          </l>
+          </block>
+          <list>
+            <block var="robot" />
+          </list>
+        </block>
+      </block>
+    </script>
+  </block-definition>
+  <block-definition s="手先を絶対位置へ動かす ロボット %&apos;robot&apos; x %&apos;x&apos; y %&apos;y&apos; z %&apos;z&apos;" type="command" category="phosphobot">
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs>
+      <input type="%n">1</input>
+      <input type="%n">0</input>
+      <input type="%n">0</input>
+      <input type="%n">0</input>
+    </inputs>
+    <script>
+      <block s="doRun">
+        <block s="reportJSFunction">
+          <list>
+            <l>robot</l>
+            <l>x</l>
+            <l>y</l>
+            <l>z</l>
+          </list>
+          <l>
+function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+var rid=Math.max(1,parseInt(robot,10)||1)-1,xhr=new XMLHttpRequest();
+xhr.open("POST",base(this)+"/move/absolute?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({x:Number(x),y:Number(y),z:Number(z)}));
+if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/move/absolute HTTP "+xhr.status+": "+xhr.responseText);}
+try{this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} return "";
+          </l>
+        </block>
+        <list>
+          <block var="robot" />
+          <block var="x" />
+          <block var="y" />
+          <block var="z" />
+        </list>
+      </block>
+    </script>
+  </block-definition>
+  <block-definition s="手先を相対移動する ロボット %&apos;robot&apos; dx %&apos;dx&apos; dy %&apos;dy&apos; dz %&apos;dz&apos;" type="command" category="phosphobot">
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs>
+      <input type="%n">1</input>
+      <input type="%n">0</input>
+      <input type="%n">0</input>
+      <input type="%n">0</input>
+    </inputs>
+    <script>
+      <block s="doRun">
+        <block s="reportJSFunction">
+          <list>
+            <l>robot</l>
+            <l>dx</l>
+            <l>dy</l>
+            <l>dz</l>
+          </list>
+          <l>
+function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+var rid=Math.max(1,parseInt(robot,10)||1)-1,xhr=new XMLHttpRequest();
+xhr.open("POST",base(this)+"/move/relative?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({x:Number(dx),y:Number(dy),z:Number(dz)}));
+if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/move/relative HTTP "+xhr.status+": "+xhr.responseText);}
+try{this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} return "";
+          </l>
+        </block>
+        <list>
+          <block var="robot" />
+          <block var="dx" />
+          <block var="dy" />
+          <block var="dz" />
+        </list>
+      </block>
+    </script>
+  </block-definition>
+  <block-definition s="グリッパー ロボット %&apos;robot&apos; 開閉 %&apos;open&apos;" type="command" category="phosphobot">
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs>
+      <input type="%n">1</input>
+      <input type="%n">1</input>
+    </inputs>
+    <script>
+      <block s="doRun">
+        <block s="reportJSFunction">
+          <list>
+            <l>robot</l>
+            <l>open</l>
+          </list>
+          <l>
+function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+var rid=Math.max(1,parseInt(robot,10)||1)-1,xhr=new XMLHttpRequest();
+xhr.open("POST",base(this)+"/move/relative?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({open:Math.max(0,Math.min(1,Number(open)))}));
+if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/move/relative HTTP "+xhr.status+": "+xhr.responseText);}
+try{this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} return "";
+          </l>
+        </block>
+        <list>
+          <block var="robot" />
+          <block var="open" />
+        </list>
+      </block>
+    </script>
+  </block-definition>
 </blocks>
