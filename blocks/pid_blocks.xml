@@ -27,7 +27,49 @@ return "";
       </block>
     </script>
   </block-definition>
-  <block-definition s="関節角度を読む 関節番号 %&apos;joint&apos;" type="reporter" category="phosphobot">
+  <block-definition s="関節角度を読む ロボット %&apos;robot&apos; 関節番号 %&apos;joint&apos;" type="reporter" category="phosphobot">
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs>
+      <input type="%n">1</input>
+      <input type="%n">1</input>
+    </inputs>
+    <script>
+      <block s="doReport">
+        <block s="evaluate">
+          <block s="reportJSFunction">
+            <list>
+              <l>robot</l>
+              <l>joint</l>
+            </list>
+            <l>
+function base(ctx) {
+  try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8020").replace(/\/$/, ""); }
+  catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8020").replace(/\/$/, ""); }
+}
+var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
+var idx = Math.max(1, parseInt(joint, 10) || 1) - 1;
+var xhr = new XMLHttpRequest();
+xhr.open("POST", base(this) + "/joints/read?robot_id=" + rid, false);
+xhr.setRequestHeader("Content-Type", "application/json");
+xhr.send(JSON.stringify({source: "robot", unit: "degrees"}));
+if (xhr.status &lt; 200 || xhr.status &gt;= 300) { throw new Error("/joints/read HTTP " + xhr.status + ": " + xhr.responseText); }
+var data = JSON.parse(xhr.responseText || "{}");
+var angle = data.angles ? data.angles[idx] : null;
+try { this.variables.setVar("current_angle", angle); } catch (e) {}
+return angle;
+          </l>
+          </block>
+          <list>
+            <block var="robot" />
+            <block var="joint" />
+          </list>
+        </block>
+      </block>
+    </script>
+  </block-definition>
+  <block-definition s="全関節角度を読む ロボット %&apos;robot&apos;" type="reporter" category="phosphobot">
     <header></header>
     <code></code>
     <translations></translations>
@@ -39,52 +81,16 @@ return "";
         <block s="evaluate">
           <block s="reportJSFunction">
             <list>
-              <l>joint</l>
+              <l>robot</l>
             </list>
             <l>
 function base(ctx) {
   try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8020").replace(/\/$/, ""); }
   catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8020").replace(/\/$/, ""); }
 }
-function post(ctx, path, body) {
-  var xhr = new XMLHttpRequest();
-  xhr.open("POST", base(ctx) + path, false);
-  xhr.setRequestHeader("Content-Type", "application/json");
-  xhr.send(JSON.stringify(body || {}));
-  if (xhr.status &lt; 200 || xhr.status &gt;= 300) { throw new Error(path + " HTTP " + xhr.status + ": " + xhr.responseText); }
-  return JSON.parse(xhr.responseText || "{}");
-}
-var id = Math.max(1, parseInt(joint, 10) || 1) - 1;
-var data = post(this, "/joints/read", {joints_ids: [id], source: "robot", unit: "degrees"});
-var angle = data.angles ? data.angles[0] : null;
-try { this.variables.setVar("current_angle", angle); } catch (e) {}
-return angle;
-          </l>
-          </block>
-          <list>
-            <block var="joint" />
-          </list>
-        </block>
-      </block>
-    </script>
-  </block-definition>
-  <block-definition s="全関節角度を読む" type="reporter" category="phosphobot">
-    <header></header>
-    <code></code>
-    <translations></translations>
-    <inputs />
-    <script>
-      <block s="doReport">
-        <block s="evaluate">
-          <block s="reportJSFunction">
-            <list />
-            <l>
-function base(ctx) {
-  try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8020").replace(/\/$/, ""); }
-  catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8020").replace(/\/$/, ""); }
-}
+var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
 var xhr = new XMLHttpRequest();
-xhr.open("POST", base(this) + "/joints/read", false);
+xhr.open("POST", base(this) + "/joints/read?robot_id=" + rid, false);
 xhr.setRequestHeader("Content-Type", "application/json");
 xhr.send(JSON.stringify({source: "robot", unit: "degrees"}));
 if (xhr.status &lt; 200 || xhr.status &gt;= 300) { throw new Error("/joints/read HTTP " + xhr.status + ": " + xhr.responseText); }
@@ -92,7 +98,9 @@ var data = JSON.parse(xhr.responseText || "{}");
 return JSON.stringify(data.angles || []);
           </l>
           </block>
-          <list />
+          <list>
+            <block var="robot" />
+          </list>
         </block>
       </block>
     </script>
@@ -154,11 +162,12 @@ return data.robot_status ? data.robot_status.length : ((data.robots || []).lengt
       </block>
     </script>
   </block-definition>
-  <block-definition s="目標角度にうごかす 関節 %&apos;joint&apos; 角度 %&apos;angle&apos;" type="command" category="phosphobot">
+  <block-definition s="目標角度にうごかす ロボット %&apos;robot&apos; 関節 %&apos;joint&apos; 角度 %&apos;angle&apos;" type="command" category="phosphobot">
     <header></header>
     <code></code>
     <translations></translations>
     <inputs>
+      <input type="%n">1</input>
       <input type="%n">1</input>
       <input type="%n">0</input>
     </inputs>
@@ -166,6 +175,7 @@ return data.robot_status ? data.robot_status.length : ((data.robots || []).lengt
       <block s="doRun">
         <block s="reportJSFunction">
           <list>
+            <l>robot</l>
             <l>joint</l>
             <l>angle</l>
           </list>
@@ -174,12 +184,14 @@ function base(ctx) {
   try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8020").replace(/\/$/, ""); }
   catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8020").replace(/\/$/, ""); }
 }
-var id = Math.max(1, parseInt(joint, 10) || 1) - 1;
+function deg2mu(d) { return d * 4096 / 360 + 2048; }
+var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
+var id = Math.max(1, parseInt(joint, 10) || 1);
 var target = Number(angle);
 var xhr = new XMLHttpRequest();
-xhr.open("POST", base(this) + "/joints/write", false);
+xhr.open("POST", base(this) + "/joints/write?robot_id=" + rid, false);
 xhr.setRequestHeader("Content-Type", "application/json");
-xhr.send(JSON.stringify({joints_ids: [id], angles: [target], unit: "degrees"}));
+xhr.send(JSON.stringify({joints_ids: [id], angles: [deg2mu(target)], unit: "motor_units"}));
 if (xhr.status &lt; 200 || xhr.status &gt;= 300) { throw new Error("/joints/write HTTP " + xhr.status + ": " + xhr.responseText); }
 try {
   this.variables.setVar("target_angle", target);
@@ -189,6 +201,7 @@ return "";
         </l>
         </block>
         <list>
+          <block var="robot" />
           <block var="joint" />
           <block var="angle" />
         </list>
@@ -286,11 +299,12 @@ return output;
       </block>
     </script>
   </block-definition>
-  <block-definition s="PIDで関節 %&apos;joint&apos; を目標角度 %&apos;target&apos; へ一歩うごかす dt秒 %&apos;dt&apos;" type="command" category="phosphobot">
+  <block-definition s="PIDで ロボット %&apos;robot&apos; 関節 %&apos;joint&apos; を目標角度 %&apos;target&apos; へ一歩うごかす dt秒 %&apos;dt&apos;" type="command" category="phosphobot">
     <header></header>
     <code></code>
     <translations></translations>
     <inputs>
+      <input type="%n">1</input>
       <input type="%n">1</input>
       <input type="%n">0</input>
       <input type="%n">0.1</input>
@@ -299,6 +313,7 @@ return output;
       <block s="doRun">
         <block s="reportJSFunction">
           <list>
+            <l>robot</l>
             <l>joint</l>
             <l>target</l>
             <l>dt</l>
@@ -320,9 +335,12 @@ function getNum(ctx, name, fallback) {
   try { var v = ctx.variables.getVar(name); return Number(v == null || v === "" ? fallback : v); }
   catch (e) { return Number(window[name] == null ? fallback : window[name]); }
 }
-var id = Math.max(1, parseInt(joint, 10) || 1) - 1;
-var read = post(this, "/joints/read", {joints_ids: [id], source: "robot", unit: "degrees"});
-var current = Number(read.angles ? read.angles[0] : 0);
+function deg2mu(d) { return d * 4096 / 360 + 2048; }
+var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
+var id = Math.max(1, parseInt(joint, 10) || 1);
+var idx = id - 1;
+var read = post(this, "/joints/read?robot_id=" + rid, {source: "robot", unit: "degrees"});
+var current = Number(read.angles ? read.angles[idx] : 0);
 var step = Math.max(0.001, Number(dt) || 0.1);
 var error = Number(target) - current;
 var p = getNum(this, "pid_p", 1);
@@ -333,7 +351,7 @@ var derivative = (error - Number(window.pid_last_error || 0)) / step;
 window.pid_last_error = error;
 var output = p * error + i * window.pid_integral + d * derivative;
 var next = current + output;
-var result = post(this, "/joints/write", {joints_ids: [id], angles: [next], unit: "degrees"});
+var result = post(this, "/joints/write?robot_id=" + rid, {joints_ids: [id], angles: [deg2mu(next)], unit: "motor_units"});
 try {
   this.variables.setVar("current_angle", current);
   this.variables.setVar("target_angle", Number(target));
@@ -346,6 +364,7 @@ return "";
         </l>
         </block>
         <list>
+          <block var="robot" />
           <block var="joint" />
           <block var="target" />
           <block var="dt" />
@@ -353,22 +372,27 @@ return "";
       </block>
     </script>
   </block-definition>
-  <block-definition s="ホームに戻る" type="command" category="phosphobot">
+  <block-definition s="ホームに戻る ロボット %&apos;robot&apos;" type="command" category="phosphobot">
     <header></header>
     <code></code>
     <translations></translations>
-    <inputs />
+    <inputs>
+      <input type="%n">1</input>
+    </inputs>
     <script>
       <block s="doRun">
         <block s="reportJSFunction">
-          <list />
+          <list>
+            <l>robot</l>
+          </list>
           <l>
 function base(ctx) {
   try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8020").replace(/\/$/, ""); }
   catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8020").replace(/\/$/, ""); }
 }
+var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
 var xhr = new XMLHttpRequest();
-xhr.open("POST", base(this) + "/move/init", false);
+xhr.open("POST", base(this) + "/move/init?robot_id=" + rid, false);
 xhr.setRequestHeader("Content-Type", "application/json");
 xhr.send("{}");
 if (xhr.status &lt; 200 || xhr.status &gt;= 300) { throw new Error("/move/init HTTP " + xhr.status + ": " + xhr.responseText); }
@@ -376,20 +400,26 @@ try { this.variables.setVar("last_response", xhr.responseText || "{}"); } catch 
 return "";
         </l>
         </block>
-        <list />
+        <list>
+          <block var="robot" />
+        </list>
       </block>
     </script>
   </block-definition>
-  <block-definition s="止まれ" type="command" category="phosphobot">
+  <block-definition s="止まれ ロボット %&apos;robot&apos;" type="command" category="phosphobot">
     <comment w="240" collapsed="false">現在角度を読み、同じ角度を書き戻す保持停止。ハードウェア非常停止ではありません。</comment>
     <header></header>
     <code></code>
     <translations></translations>
-    <inputs />
+    <inputs>
+      <input type="%n">1</input>
+    </inputs>
     <script>
       <block s="doRun">
         <block s="reportJSFunction">
-          <list />
+          <list>
+            <l>robot</l>
+          </list>
           <l>
 function base(ctx) {
   try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8020").replace(/\/$/, ""); }
@@ -403,14 +433,17 @@ function post(ctx, path, body) {
   if (xhr.status &lt; 200 || xhr.status &gt;= 300) { throw new Error(path + " HTTP " + xhr.status + ": " + xhr.responseText); }
   return JSON.parse(xhr.responseText || "{}");
 }
-var read = post(this, "/joints/read", {source: "robot", unit: "degrees"});
+var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
+var read = post(this, "/joints/read?robot_id=" + rid, {source: "robot", unit: "motor_units"});
 var angles = read.angles || [];
-var result = post(this, "/joints/write", {angles: angles, unit: "degrees"});
+var result = post(this, "/joints/write?robot_id=" + rid, {angles: angles, unit: "motor_units"});
 try { this.variables.setVar("last_response", JSON.stringify(result)); } catch (e) {}
 return "";
         </l>
         </block>
-        <list />
+        <list>
+          <block var="robot" />
+        </list>
       </block>
     </script>
   </block-definition>
