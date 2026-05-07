@@ -152,8 +152,11 @@ var data=JSON.parse(xhr.responseText||"{}");try{this.variables.setVar("last_resp
           <l>
 function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
 function deg2mu(d){return d*4096/360+2048;}
-var rid=Math.max(1,parseInt(robot,10)||1)-1,id=Math.max(1,parseInt(joint,10)||1),target=Number(angle),xhr=new XMLHttpRequest();
-xhr.open("POST",base(this)+"/joints/write?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({joints_ids:[id],angles:[deg2mu(target)],unit:"motor_units"}));
+var rid=Math.max(1,parseInt(robot,10)||1)-1,idx=Math.max(1,parseInt(joint,10)||1)-1,target=Number(angle);
+var r=new XMLHttpRequest();r.open("POST",base(this)+"/joints/read?robot_id="+rid,false);r.setRequestHeader("Content-Type","application/json");r.send(JSON.stringify({source:"robot",unit:"motor_units"}));
+if(r.status&lt;200||r.status&gt;=300){throw new Error("/joints/read HTTP "+r.status+": "+r.responseText);}
+var angles=JSON.parse(r.responseText||"{}").angles||[];angles[idx]=deg2mu(target);
+var xhr=new XMLHttpRequest();xhr.open("POST",base(this)+"/joints/write?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({angles:angles,unit:"motor_units"}));
 if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/joints/write HTTP "+xhr.status+": "+xhr.responseText);}
 try{this.variables.setVar("target_angle",target);this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} return "";
     </l>
@@ -254,11 +257,13 @@ function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||win
 function post(ctx,path,body){var xhr=new XMLHttpRequest();xhr.open("POST",base(ctx)+path,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify(body||{}));if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error(path+" HTTP "+xhr.status+": "+xhr.responseText);}return JSON.parse(xhr.responseText||"{}");}
 function getNum(ctx,name,fallback){try{var v=ctx.variables.getVar(name);return Number(v==null||v===""?fallback:v);}catch(e){return Number(window[name]==null?fallback:window[name]);}}
 function deg2mu(d){return d*4096/360+2048;}
-var rid=Math.max(1,parseInt(robot,10)||1)-1,id=Math.max(1,parseInt(joint,10)||1),idx=id-1;
-var read=post(this,"/joints/read?robot_id="+rid,{source:"robot",unit:"degrees"}),current=Number(read.angles?read.angles[idx]:0);
+var rid=Math.max(1,parseInt(robot,10)||1)-1,idx=Math.max(1,parseInt(joint,10)||1)-1;
+var readDeg=post(this,"/joints/read?robot_id="+rid,{source:"robot",unit:"degrees"}),current=Number(readDeg.angles?readDeg.angles[idx]:0);
 var step=Math.max(0.001,Number(dt)||0.1),error=Number(target)-current,p=getNum(this,"pid_p",1),i=getNum(this,"pid_i",0),d=getNum(this,"pid_d",0);
 window.pid_integral=Number(window.pid_integral||0)+error*step;var derivative=(error-Number(window.pid_last_error||0))/step;window.pid_last_error=error;
-var next=current+(p*error+i*window.pid_integral+d*derivative),result=post(this,"/joints/write?robot_id="+rid,{joints_ids:[id],angles:[deg2mu(next)],unit:"motor_units"});
+var next=current+(p*error+i*window.pid_integral+d*derivative);
+var readMu=post(this,"/joints/read?robot_id="+rid,{source:"robot",unit:"motor_units"}),angles=readMu.angles||[];angles[idx]=deg2mu(next);
+var result=post(this,"/joints/write?robot_id="+rid,{angles:angles,unit:"motor_units"});
 try{this.variables.setVar("current_angle",current);this.variables.setVar("target_angle",Number(target));this.variables.setVar("pid_error",error);this.variables.setVar("pid_integral",window.pid_integral);this.variables.setVar("pid_derivative",derivative);this.variables.setVar("last_response",JSON.stringify(result));}catch(e){} return "";
     </l>
         </block>
