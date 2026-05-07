@@ -642,6 +642,7 @@ var xhr = new XMLHttpRequest();
 xhr.open("POST", base(this) + "/joints/write?robot_id=" + rid, false);
 xhr.setRequestHeader("Content-Type", "application/json");
 xhr.send(JSON.stringify({angles: angles, unit: "motor_units"}));
+var wait = Date.now() + 2000; while (Date.now() &lt; wait) {}
 var xhr2 = new XMLHttpRequest();
 xhr2.open("POST", base(this) + "/torque/toggle?robot_id=" + rid, false);
 xhr2.setRequestHeader("Content-Type", "application/json");
