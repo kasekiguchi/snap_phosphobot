@@ -461,4 +461,36 @@ try{this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} re
       </block>
     </script>
   </block-definition>
+  <block-definition s="安全に脱力する ロボット %&apos;robot&apos;" type="command" category="phosphobot">
+    <comment w="240" collapsed="false">安全な角度に移動してからトルクOFF（脱力）します。</comment>
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs>
+      <input type="%n">1</input>
+    </inputs>
+    <script>
+      <block s="doRun">
+        <block s="reportJSFunction">
+          <list>
+            <l>robot</l>
+          </list>
+          <l>
+function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+var rid=Math.max(1,parseInt(robot,10)||1)-1;
+var safe=[[2006.0,5012.7,-1160.8,852.7,67.5,3231.3],[2067.0,868.7,3048.2,835.7,90.5,2104.0]];
+var angles=safe[rid]||safe[0];
+var xhr=new XMLHttpRequest();xhr.open("POST",base(this)+"/joints/write?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({angles:angles,unit:"motor_units"}));
+if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/joints/write HTTP "+xhr.status+": "+xhr.responseText);}
+var xhr2=new XMLHttpRequest();xhr2.open("POST",base(this)+"/torque/toggle?robot_id="+rid,false);xhr2.setRequestHeader("Content-Type","application/json");xhr2.send(JSON.stringify({torque_status:false}));
+if(xhr2.status&lt;200||xhr2.status&gt;=300){throw new Error("/torque/toggle HTTP "+xhr2.status+": "+xhr2.responseText);}
+try{this.variables.setVar("last_response",xhr2.responseText||"{}");}catch(e){} return "";
+          </l>
+        </block>
+        <list>
+          <block var="robot" />
+        </list>
+      </block>
+    </script>
+  </block-definition>
 </blocks>
