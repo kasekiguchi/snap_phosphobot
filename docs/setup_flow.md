@@ -16,78 +16,6 @@ SO-100 / SO-101 ロボットアーム
 
 phosphobot 本体は `8020` で動きます。Snap! はブラウザ上で動くため、直接 `8020` にアクセスするとブラウザのセキュリティ制限に当たることがあります。そのため、Snap! からは `8021` の CORS プロキシに接続します。
 
-## 講師向け: 8020 と 8021 の役割
-
-授業中に意識するサーバーは2つあります。
-
-```text
-8020: phosphobot 本体
-8021: Snap! からアクセスするための中継サーバー
-```
-
-### 8020: phosphobot 本体
-
-`phosphobot run` で起動する API サーバーです。ロボットアームと直接通信します。
-
-主な役割:
-
-- ロボットの接続状態を返す
-- 関節角度を読む
-- 関節角度を書き込んで動かす
-- キャリブレーションや初期姿勢移動を実行する
-
-確認例:
-
-```bash
-curl http://localhost:8020/status
-```
-
-Pi5 上で `8020` の status が返らない場合、phosphobot 本体が起動していません。この場合、Snap! 側を直しても動きません。
-
-### 8021: CORS プロキシ
-
-`python3 proxy/cors_proxy.py` で起動する、この教材用の中継サーバーです。
-
-Snap! はブラウザ上で動きます。ブラウザには、別の機器や別ポートの API に勝手にアクセスできないようにする制限があります。この制限により、phosphobot 本体の `8020` に直接つなぐと `NetworkError` になることがあります。
-
-そこで、Snap! は `8021` にアクセスします。`8021` のプロキシは、同じ Pi5 上の `localhost:8020` にリクエストを転送し、ブラウザが必要とする許可ヘッダーを付けて返します。
-
-確認例:
-
-```bash
-curl http://localhost:8021/status
-curl http://<Pi5のIPアドレス>:8021/status
-```
-
-### 授業中の接続先
-
-Snap! のカスタムブロックでは、基本的に `8021` を指定します。
-
-```text
-phosphobot URLを [http://<Pi5のIPアドレス>:8021] にする
-```
-
-`8020` は phosphobot 本体のポートですが、Snap! から直接指定しない運用にしておくとトラブルを減らせます。
-
-### エラーの切り分け
-
-```text
-Snap! で NetworkError
-  → 8021 プロキシが起動していない、または Snap! の接続先が 8020 になっている可能性
-
-curl http://<Pi5のIPアドレス>:8021/status が返らない
-  → 8021 プロキシが起動していない、またはネットワーク到達性の問題
-
-curl http://localhost:8020/status が返らない
-  → phosphobot 本体が起動していない
-
-/joints/read が 500
-  → CORS ではなく phosphobot 側の実機読み取りエラー
-  → キャリブレーション未完了、ロボット設定未作成、USB接続などを確認
-```
-
-特に、`OPTIONS /joints/read 200` の後に `POST /joints/read 500` と表示される場合、CORS プロキシは動いています。残っている問題は phosphobot 本体側です。
-
 ## Pi5 側の準備
 
 ### 1. ロボットアームを接続する
@@ -102,7 +30,7 @@ sudo chmod 666 /dev/ttyACM*
 
 ### 2. phosphobot を起動する
 
-Pi5 上で phosphobot API サーバーを起動します。
+Pi5 上で phosphobot API サーバーを起動します。phosphobotのインストールがまだの場合は[RPi5の設定](setup_rpi5.md)を先にやってください。
 
 ```bash
 phosphobot run
@@ -121,14 +49,10 @@ curl http://localhost:8020/status
 別ターミナルで、このリポジトリのディレクトリへ移動します。
 
 ```bash
+git clone  https://github.com/kasekiguchi/snap_phosphobot.git
 cd snap_phosphobot
-python3 proxy/cors_proxy.py
-```
-
-必要な Python パッケージがない場合は、先にインストールします。
-
-```bash
 python3 -m pip install flask requests
+python3 proxy/cors_proxy.py
 ```
 
 プロキシが起動すると、`8021` で待ち受けます。Pi5 上で確認します。
@@ -149,7 +73,7 @@ curl http://<Pi5のIPアドレス>:8021/status
 curl http://192.168.100.103:8021/status
 ```
 
-## クライアント PC 側の準備
+## クライアント PC 側の準備（同一PCでもOK）
 
 ### 1. Snap! を開く
 
@@ -256,6 +180,82 @@ CORS の問題ではなく、phosphobot 側の実機読み取りエラーです�
 ### ロボットが 0 台と表示される
 
 USB 接続、`/dev/ttyACM*` の権限、phosphobot の起動状態を確認してください。
+
+
+
+
+## 講師向け: 8020 と 8021 の役割
+
+授業中に意識するサーバーは2つあります。
+
+```text
+8020: phosphobot 本体
+8021: Snap! からアクセスするための中継サーバー
+```
+
+### 8020: phosphobot 本体
+
+`phosphobot run` で起動する API サーバーです。ロボットアームと直接通信します。
+
+主な役割:
+
+- ロボットの接続状態を返す
+- 関節角度を読む
+- 関節角度を書き込んで動かす
+- キャリブレーションや初期姿勢移動を実行する
+
+確認例:
+
+```bash
+curl http://localhost:8020/status
+```
+
+Pi5 上で `8020` の status が返らない場合、phosphobot 本体が起動していません。この場合、Snap! 側を直しても動きません。
+
+### 8021: CORS プロキシ
+
+`python3 proxy/cors_proxy.py` で起動する、この教材用の中継サーバーです。
+
+Snap! はブラウザ上で動きます。ブラウザには、別の機器や別ポートの API に勝手にアクセスできないようにする制限があります。この制限により、phosphobot 本体の `8020` に直接つなぐと `NetworkError` になることがあります。
+
+そこで、Snap! は `8021` にアクセスします。`8021` のプロキシは、同じ Pi5 上の `localhost:8020` にリクエストを転送し、ブラウザが必要とする許可ヘッダーを付けて返します。
+
+確認例:
+
+```bash
+curl http://localhost:8021/status
+curl http://<Pi5のIPアドレス>:8021/status
+```
+
+### 授業中の接続先
+
+Snap! のカスタムブロックでは、基本的に `8021` を指定します。
+
+```text
+phosphobot URLを [http://<Pi5のIPアドレス>:8021] にする
+```
+
+`8020` は phosphobot 本体のポートですが、Snap! から直接指定しない運用にしておくとトラブルを減らせます。
+
+### エラーの切り分け
+
+```text
+Snap! で NetworkError
+  → 8021 プロキシが起動していない、または Snap! の接続先が 8020 になっている可能性
+
+curl http://<Pi5のIPアドレス>:8021/status が返らない
+  → 8021 プロキシが起動していない、またはネットワーク到達性の問題
+
+curl http://localhost:8020/status が返らない
+  → phosphobot 本体が起動していない
+
+/joints/read が 500
+  → CORS ではなく phosphobot 側の実機読み取りエラー
+  → キャリブレーション未完了、ロボット設定未作成、USB接続などを確認
+```
+
+特に、`OPTIONS /joints/read 200` の後に `POST /joints/read 500` と表示される場合、CORS プロキシは動いています。残っている問題は phosphobot 本体側です。
+
 
 ```bash
 sudo chmod 666 /dev/ttyACM*
