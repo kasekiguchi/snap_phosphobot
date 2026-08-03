@@ -71,3 +71,14 @@ sudo chmod 666 /dev/ttyACM1
 ```bash
 lerobot-teleoperate     --robot.type=so101_follower     --robot.port=/dev/ttyACM1     --robot.id=follower_arm     --teleop.type=so101_leader     --teleop.port=/dev/ttyACM0     --teleop.id=leader_arm
 ```
+
+## Phosphobot
+
+### install
+
+```bash
+cd 
+curl -fsSL https://raw.githubusercontent.com/phospho-app/phosphobot/main/install.sh | sudo bash
+```
+
+[Next setup](setup_flow.md)
