@@ -8,35 +8,26 @@
 sudo apt update && sudo apt upgrade -y
 ```
 
-仮想環境構築
+uv install
 ```bash
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh
-chmod +x Miniconda3-latest-Linux-aarch64.sh
-./Miniconda3-latest-Linux-aarch64.sh
-source ~/.bashrc
+curl -LsSf https://astral.sh/uv/install.sh | sh
+exec $SHELL
 ```
 
-lerobot 
-```bash
-# conda create -y -n lerobot python=3.10 && conda activate lerobot
-conda create -n lerobot python=3.12 -y
-conda activate lerobot
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
-pip install lerobot
-```
-
+lerobot
 ```bash
 git clone https://github.com/Seeed-Projects/lerobot.git ~/lerobot
 ```
 
+仮想環境構築 
 ```bash
-conda install ffmpeg -c conda-forge
+uv python install 3.13
+mkdir -p ~/lerobot && cd ~/lerobot
+uv venv --python 3.13
+source .venv/bin/activate
+uv pip install torch torchvision --torch-backend=cpu
+uv pip install "lerobot[feetech]"
 ```
-
-```bash
-cd ~/lerobot && pip install -e ".[feetech]"
-```
-
 
 ２回目以降ログインしたときは以下を実行する
 ```bash
