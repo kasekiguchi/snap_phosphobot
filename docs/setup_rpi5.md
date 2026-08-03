@@ -10,36 +10,43 @@ sudo apt update && sudo apt upgrade -y
 
 仮想環境構築
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh
+chmod +x Miniconda3-latest-Linux-aarch64.sh
+./Miniconda3-latest-Linux-aarch64.sh
 source ~/.bashrc
 ```
 
 lerobot 
 ```bash
-mkdir -p ~/lerobot-ws && cd ~/lerobot-ws
-uv venv --python 3.13
-source .venv/bin/activate
+# conda create -y -n lerobot python=3.10 && conda activate lerobot
+conda create -n lerobot python=3.12 -y
+conda activate lerobot
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+pip install lerobot
 ```
 
-torch
 ```bash
-sudo apt install -y libopenblas-dev ffmpeg
-uv pip install torch torchvision --torch-backend=cpu
-uv pip install lerobot
+git clone https://github.com/Seeed-Projects/lerobot.git ~/lerobot
 ```
 
-feetech
 ```bash
-uv pip install "lerobot[feetech]"
+conda install ffmpeg -c conda-forge
 ```
+
+```bash
+cd ~/lerobot && pip install -e ".[feetech]"
+```
+
 
 ２回目以降ログインしたときは以下を実行する
 ```bash
-cd ~/lerobot-ws
+cd ~/lerobot
 source .venv/bin/activate
 ```
 
 ## LeRobot
+
+[こちら](https://huggingface.co/docs/lerobot/so101)や[こちら](https://wiki.seeedstudio.com/lerobot_so100m/)を参考に組み立てる。
 
 ### Calibration
 
