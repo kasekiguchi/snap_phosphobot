@@ -177,6 +177,27 @@ python3 proxy/cors_proxy.py
 
 CORS の問題ではなく、phosphobot 側の実機読み取りエラーです。キャリブレーションが完了しているか、phosphobot を起動しているターミナルのエラーログを確認してください。
 
+### 角度を「読む」は成功するのに「動かす」と 500 になる
+
+phosphobot のログに次が出ている場合、そのアームが**未キャリブレーション**です。
+
+```text
+ValueError: Robot configuration is not set. Run the calibration first.
+```
+
+読み取り（生の motor_units）は変換不要なので成功しますが、書き込みは `motor_units → ラジアン` 変換にキャリブレーション情報を使うため、未校正だと必ず 500 になります。Snap! 側ではなく phosphobot 側で一度校正が必要です。
+
+1. どのアームが未校正か確認（`config` が `null` なら未校正）:
+
+   ```bash
+   curl -s -X POST "http://localhost:8020/robot/config?robot_id=1"
+   ```
+
+2. ダッシュボード `http://<Pi5のIP>:8020/` を開き、対象アームの Calibration ウィザードを実行（または `POST /calibrate?robot_id=1` の対話式）。
+3. 再度 `robot/config` で `config` が入っていれば OK。Snap! の「目標角度にうごかす ロボット 2」を再実行する。
+
+書き込み（`/joints/write`）が可能なのは follower（ロボット 2 / robot_id=1）のみです。
+
 ### ロボットが 0 台と表示される
 
 USB 接続、`/dev/ttyACM*` の権限、phosphobot の起動状態を確認してください。
