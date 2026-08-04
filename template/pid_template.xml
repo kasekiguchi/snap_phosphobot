@@ -47,9 +47,9 @@ return "";
             <l>
 function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return String(v).replace(/\/$/,"");}catch(e){}if(window.phosphobot_url)return String(window.phosphobot_url).replace(/\/$/,"");try{var ls=localStorage.getItem("phosphobot_url");if(ls)return String(ls).replace(/\/$/,"");}catch(e){}return "http://192.168.100.103:8021";}
 var rid=Math.max(1,parseInt(robot,10)||1)-1,idx=Math.max(1,parseInt(joint,10)||1)-1,xhr=new XMLHttpRequest();
-xhr.open("POST",base(this)+"/joints/read?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({source:"robot",unit:"degrees"}));
+xhr.open("POST",base(this)+"/joints/read?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({source:"robot",unit:"motor_units"}));
 if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/joints/read HTTP "+xhr.status+": "+xhr.responseText);}
-var data=JSON.parse(xhr.responseText||"{}"),angle=data.angles?data.angles[idx]:null;try{this.variables.setVar("current_angle",angle);}catch(e){} return angle;
+var data=JSON.parse(xhr.responseText||"{}"),mu=data.angles?data.angles[idx]:null,angle=(mu==null)?null:(Number(mu)-2048)*360/4096;try{this.variables.setVar("current_angle",angle);}catch(e){} return angle;
     </l>
           </block>
           <list>
@@ -77,9 +77,9 @@ var data=JSON.parse(xhr.responseText||"{}"),angle=data.angles?data.angles[idx]:n
             <l>
 function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return String(v).replace(/\/$/,"");}catch(e){}if(window.phosphobot_url)return String(window.phosphobot_url).replace(/\/$/,"");try{var ls=localStorage.getItem("phosphobot_url");if(ls)return String(ls).replace(/\/$/,"");}catch(e){}return "http://192.168.100.103:8021";}
 var rid=Math.max(1,parseInt(robot,10)||1)-1,xhr=new XMLHttpRequest();
-xhr.open("POST",base(this)+"/joints/read?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({source:"robot",unit:"degrees"}));
+xhr.open("POST",base(this)+"/joints/read?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({source:"robot",unit:"motor_units"}));
 if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/joints/read HTTP "+xhr.status+": "+xhr.responseText);}
-return JSON.stringify((JSON.parse(xhr.responseText||"{}").angles)||[]);
+return JSON.stringify(((JSON.parse(xhr.responseText||"{}").angles)||[]).map(function(m){return m==null?null:(Number(m)-2048)*360/4096;}));
     </l>
           </block>
           <list>
@@ -259,11 +259,12 @@ function post(ctx,path,body){var xhr=new XMLHttpRequest();xhr.open("POST",base(c
 function getNum(ctx,name,fallback){try{var v=ctx.variables.getVar(name);return Number(v==null||v===""?fallback:v);}catch(e){return Number(window[name]==null?fallback:window[name]);}}
 function deg2mu(d){return d*4096/360+2048;}
 var rid=Math.max(1,parseInt(robot,10)||1)-1,idx=Math.max(1,parseInt(joint,10)||1)-1;
-var readDeg=post(this,"/joints/read?robot_id="+rid,{source:"robot",unit:"degrees"}),current=Number(readDeg.angles?readDeg.angles[idx]:0);
+var readMu=post(this,"/joints/read?robot_id="+rid,{source:"robot",unit:"motor_units"}),angles=readMu.angles||[];
+var current=angles[idx]==null?0:(Number(angles[idx])-2048)*360/4096;
 var step=Math.max(0.001,Number(dt)||0.1),error=Number(target)-current,p=getNum(this,"pid_p",1),i=getNum(this,"pid_i",0),d=getNum(this,"pid_d",0);
 window.pid_integral=Number(window.pid_integral||0)+error*step;var derivative=(error-Number(window.pid_last_error||0))/step;window.pid_last_error=error;
 var next=current+(p*error+i*window.pid_integral+d*derivative);
-var readMu=post(this,"/joints/read?robot_id="+rid,{source:"robot",unit:"motor_units"}),angles=readMu.angles||[];angles[idx]=deg2mu(next);
+angles[idx]=deg2mu(next);
 var result=post(this,"/joints/write?robot_id="+rid,{angles:angles,unit:"motor_units"});
 try{this.variables.setVar("current_angle",current);this.variables.setVar("target_angle",Number(target));this.variables.setVar("pid_error",error);this.variables.setVar("pid_integral",window.pid_integral);this.variables.setVar("pid_derivative",derivative);this.variables.setVar("last_response",JSON.stringify(result));}catch(e){} return "";
     </l>

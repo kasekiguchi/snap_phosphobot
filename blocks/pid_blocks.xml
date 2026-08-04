@@ -56,10 +56,11 @@ var idx = Math.max(1, parseInt(joint, 10) || 1) - 1;
 var xhr = new XMLHttpRequest();
 xhr.open("POST", base(this) + "/joints/read?robot_id=" + rid, false);
 xhr.setRequestHeader("Content-Type", "application/json");
-xhr.send(JSON.stringify({source: "robot", unit: "degrees"}));
+xhr.send(JSON.stringify({source: "robot", unit: "motor_units"}));
 if (xhr.status &lt; 200 || xhr.status &gt;= 300) { throw new Error("/joints/read HTTP " + xhr.status + ": " + xhr.responseText); }
 var data = JSON.parse(xhr.responseText || "{}");
-var angle = data.angles ? data.angles[idx] : null;
+var mu = data.angles ? data.angles[idx] : null;
+var angle = (mu == null) ? null : (Number(mu) - 2048) * 360 / 4096;
 try { this.variables.setVar("current_angle", angle); } catch (e) {}
 return angle;
           </l>
@@ -97,10 +98,11 @@ var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
 var xhr = new XMLHttpRequest();
 xhr.open("POST", base(this) + "/joints/read?robot_id=" + rid, false);
 xhr.setRequestHeader("Content-Type", "application/json");
-xhr.send(JSON.stringify({source: "robot", unit: "degrees"}));
+xhr.send(JSON.stringify({source: "robot", unit: "motor_units"}));
 if (xhr.status &lt; 200 || xhr.status &gt;= 300) { throw new Error("/joints/read HTTP " + xhr.status + ": " + xhr.responseText); }
 var data = JSON.parse(xhr.responseText || "{}");
-return JSON.stringify(data.angles || []);
+var degs = (data.angles || []).map(function (m) { return m == null ? null : (Number(m) - 2048) * 360 / 4096; });
+return JSON.stringify(degs);
           </l>
           </block>
           <list>
@@ -358,8 +360,9 @@ function getNum(ctx, name, fallback) {
 function deg2mu(d) { return d * 4096 / 360 + 2048; }
 var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
 var idx = Math.max(1, parseInt(joint, 10) || 1) - 1;
-var readDeg = post(this, "/joints/read?robot_id=" + rid, {source: "robot", unit: "degrees"});
-var current = Number(readDeg.angles ? readDeg.angles[idx] : 0);
+var readMu = post(this, "/joints/read?robot_id=" + rid, {source: "robot", unit: "motor_units"});
+var angles = readMu.angles || [];
+var current = (angles[idx] == null) ? 0 : (Number(angles[idx]) - 2048) * 360 / 4096;
 var step = Math.max(0.001, Number(dt) || 0.1);
 var error = Number(target) - current;
 var p = getNum(this, "pid_p", 1);
@@ -370,8 +373,6 @@ var derivative = (error - Number(window.pid_last_error || 0)) / step;
 window.pid_last_error = error;
 var output = p * error + i * window.pid_integral + d * derivative;
 var next = current + output;
-var readMu = post(this, "/joints/read?robot_id=" + rid, {source: "robot", unit: "motor_units"});
-var angles = readMu.angles || [];
 angles[idx] = deg2mu(next);
 var result = post(this, "/joints/write?robot_id=" + rid, {angles: angles, unit: "motor_units"});
 try {
