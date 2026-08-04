@@ -206,8 +206,8 @@ r.open("POST", base(this) + "/joints/read?robot_id=" + rid, false);
 r.setRequestHeader("Content-Type", "application/json");
 r.send(JSON.stringify({source: "robot", unit: "motor_units"}));
 if (r.status &lt; 200 || r.status &gt;= 300) { throw new Error("/joints/read HTTP " + r.status + ": " + r.responseText); }
-var angles = (JSON.parse(r.responseText || "{}").angles || []).map(function (a) { return Number(a); });
-angles[idx] = deg2mu(target);
+var angles = (JSON.parse(r.responseText || "{}").angles || []).map(function (a) { return Math.round(Number(a)); });
+angles[idx] = Math.round(deg2mu(target));
 if (angles.length &lt; 6 || angles.some(function (n) { return !isFinite(n); })) { throw new Error("関節角度を読めませんでした(null)。書き込みはfollower(ロボット2)で行ってください。"); }
 var xhr = new XMLHttpRequest();
 xhr.open("POST", base(this) + "/joints/write?robot_id=" + rid, false);
@@ -362,7 +362,7 @@ function deg2mu(d) { return d * 4096 / 360 + 2048; }
 var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
 var idx = Math.max(1, parseInt(joint, 10) || 1) - 1;
 var readMu = post(this, "/joints/read?robot_id=" + rid, {source: "robot", unit: "motor_units"});
-var angles = (readMu.angles || []).map(function (a) { return Number(a); });
+var angles = (readMu.angles || []).map(function (a) { return Math.round(Number(a)); });
 var current = !isFinite(angles[idx]) ? 0 : (angles[idx] - 2048) * 360 / 4096;
 var step = Math.max(0.001, Number(dt) || 0.1);
 var error = Number(target) - current;
@@ -374,7 +374,7 @@ var derivative = (error - Number(window.pid_last_error || 0)) / step;
 window.pid_last_error = error;
 var output = p * error + i * window.pid_integral + d * derivative;
 var next = current + output;
-angles[idx] = deg2mu(next);
+angles[idx] = Math.round(deg2mu(next));
 if (angles.length &lt; 6 || angles.some(function (n) { return !isFinite(n); })) { throw new Error("関節角度を読めませんでした(null)。PID制御はfollower(ロボット2)で行ってください。"); }
 var result = post(this, "/joints/write?robot_id=" + rid, {angles: angles, unit: "motor_units"});
 try {
@@ -464,7 +464,7 @@ function post(ctx, path, body) {
 }
 var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
 var read = post(this, "/joints/read?robot_id=" + rid, {source: "robot", unit: "motor_units"});
-var angles = (read.angles || []).map(function (a) { return Number(a); });
+var angles = (read.angles || []).map(function (a) { return Math.round(Number(a)); });
 if (angles.length &lt; 6 || angles.some(function (n) { return !isFinite(n); })) { throw new Error("関節角度を読めませんでした(null)。停止はfollower(ロボット2)で行ってください。"); }
 var result = post(this, "/joints/write?robot_id=" + rid, {angles: angles, unit: "motor_units"});
 try { this.variables.setVar("last_response", JSON.stringify(result)); } catch (e) {}
@@ -672,7 +672,7 @@ if (rid === 1) {
   var xhr = new XMLHttpRequest();
   xhr.open("POST", base(this) + "/joints/write?robot_id=1", false);
   xhr.setRequestHeader("Content-Type", "application/json");
-  xhr.send(JSON.stringify({angles: safe, unit: "motor_units"}));
+  xhr.send(JSON.stringify({angles: safe.map(function (a) { return Math.round(a); }), unit: "motor_units"}));
 } else {
   var xhr = new XMLHttpRequest();
   xhr.open("POST", base(this) + "/move/absolute?robot_id=" + rid, false);
