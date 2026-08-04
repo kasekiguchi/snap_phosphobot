@@ -51,7 +51,12 @@ curl http://localhost:8020/status
 ```bash
 git clone  https://github.com/kasekiguchi/snap_phosphobot.git
 cd snap_phosphobot
-python3 -m pip install flask requests
+source ~/lerobot/.venv/bin/activate
+uv pip install flask requests
+```
+
+```bash
+cd ~/snap_phosphobot
 python3 proxy/cors_proxy.py
 ```
 
