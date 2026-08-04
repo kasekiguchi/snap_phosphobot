@@ -117,9 +117,10 @@ phosphobot URLを [http://<Pi5のIPアドレス>:8021] にする
 ```
 
 例:
+<img width="726" height="266" alt="image" src="https://github.com/user-attachments/assets/e444ef5e-26c1-47ad-9c88-ecf7bb075d16" />
 
 ```text
-phosphobot URLを [http://192.168.100.103:8021] にする
+phosphobot URLを [http://127.0.0.1:8021] にする
 ```
 
 通常は `8020` ではなく `8021` を指定します。`8021` は CORS プロキシのポートです。
