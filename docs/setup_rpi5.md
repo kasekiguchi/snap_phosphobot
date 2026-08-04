@@ -22,7 +22,6 @@ git clone https://github.com/Seeed-Projects/lerobot.git ~/lerobot
 仮想環境構築 
 ```bash
 uv python install 3.13
-mkdir -p ~/lerobot && cd ~/lerobot
 uv venv --python 3.13
 source .venv/bin/activate
 uv pip install torch torchvision --torch-backend=cpu
