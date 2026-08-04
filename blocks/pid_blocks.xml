@@ -17,6 +17,7 @@
           </list>
           <l>
 window.phosphobot_url = String(url).replace(/\/$/, "");
+try { localStorage.setItem("phosphobot_url", window.phosphobot_url); } catch (e) {}
 try { this.variables.setVar("phosphobot_url", window.phosphobot_url); } catch (e) {}
 return "";
         </l>
@@ -45,8 +46,10 @@ return "";
             </list>
             <l>
 function base(ctx) {
-  try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
-  catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
+  try { var v = ctx.variables.getVar("phosphobot_url"); if (v) return String(v).replace(/\/$/, ""); } catch (e) {}
+  if (window.phosphobot_url) return String(window.phosphobot_url).replace(/\/$/, "");
+  try { var ls = localStorage.getItem("phosphobot_url"); if (ls) return String(ls).replace(/\/$/, ""); } catch (e) {}
+  return "http://192.168.100.103:8021";
 }
 var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
 var idx = Math.max(1, parseInt(joint, 10) || 1) - 1;
@@ -85,8 +88,10 @@ return angle;
             </list>
             <l>
 function base(ctx) {
-  try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
-  catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
+  try { var v = ctx.variables.getVar("phosphobot_url"); if (v) return String(v).replace(/\/$/, ""); } catch (e) {}
+  if (window.phosphobot_url) return String(window.phosphobot_url).replace(/\/$/, "");
+  try { var ls = localStorage.getItem("phosphobot_url"); if (ls) return String(ls).replace(/\/$/, ""); } catch (e) {}
+  return "http://192.168.100.103:8021";
 }
 var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
 var xhr = new XMLHttpRequest();
@@ -117,8 +122,10 @@ return JSON.stringify(data.angles || []);
             <list />
             <l>
 function base(ctx) {
-  try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
-  catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
+  try { var v = ctx.variables.getVar("phosphobot_url"); if (v) return String(v).replace(/\/$/, ""); } catch (e) {}
+  if (window.phosphobot_url) return String(window.phosphobot_url).replace(/\/$/, "");
+  try { var ls = localStorage.getItem("phosphobot_url"); if (ls) return String(ls).replace(/\/$/, ""); } catch (e) {}
+  return "http://192.168.100.103:8021";
 }
 var xhr = new XMLHttpRequest();
 xhr.open("GET", base(this) + "/status", false);
@@ -145,8 +152,10 @@ return xhr.responseText || "{}";
             <list />
             <l>
 function base(ctx) {
-  try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
-  catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
+  try { var v = ctx.variables.getVar("phosphobot_url"); if (v) return String(v).replace(/\/$/, ""); } catch (e) {}
+  if (window.phosphobot_url) return String(window.phosphobot_url).replace(/\/$/, "");
+  try { var ls = localStorage.getItem("phosphobot_url"); if (ls) return String(ls).replace(/\/$/, ""); } catch (e) {}
+  return "http://192.168.100.103:8021";
 }
 var xhr = new XMLHttpRequest();
 xhr.open("GET", base(this) + "/status", false);
@@ -181,8 +190,10 @@ return data.robot_status ? data.robot_status.length : ((data.robots || []).lengt
           </list>
           <l>
 function base(ctx) {
-  try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
-  catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
+  try { var v = ctx.variables.getVar("phosphobot_url"); if (v) return String(v).replace(/\/$/, ""); } catch (e) {}
+  if (window.phosphobot_url) return String(window.phosphobot_url).replace(/\/$/, "");
+  try { var ls = localStorage.getItem("phosphobot_url"); if (ls) return String(ls).replace(/\/$/, ""); } catch (e) {}
+  return "http://192.168.100.103:8021";
 }
 function deg2mu(d) { return d * 4096 / 360 + 2048; }
 var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
@@ -327,8 +338,10 @@ return output;
           </list>
           <l>
 function base(ctx) {
-  try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
-  catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
+  try { var v = ctx.variables.getVar("phosphobot_url"); if (v) return String(v).replace(/\/$/, ""); } catch (e) {}
+  if (window.phosphobot_url) return String(window.phosphobot_url).replace(/\/$/, "");
+  try { var ls = localStorage.getItem("phosphobot_url"); if (ls) return String(ls).replace(/\/$/, ""); } catch (e) {}
+  return "http://192.168.100.103:8021";
 }
 function post(ctx, path, body) {
   var xhr = new XMLHttpRequest();
@@ -396,8 +409,10 @@ return "";
           </list>
           <l>
 function base(ctx) {
-  try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
-  catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
+  try { var v = ctx.variables.getVar("phosphobot_url"); if (v) return String(v).replace(/\/$/, ""); } catch (e) {}
+  if (window.phosphobot_url) return String(window.phosphobot_url).replace(/\/$/, "");
+  try { var ls = localStorage.getItem("phosphobot_url"); if (ls) return String(ls).replace(/\/$/, ""); } catch (e) {}
+  return "http://192.168.100.103:8021";
 }
 var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
 var xhr = new XMLHttpRequest();
@@ -431,8 +446,10 @@ return "";
           </list>
           <l>
 function base(ctx) {
-  try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
-  catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
+  try { var v = ctx.variables.getVar("phosphobot_url"); if (v) return String(v).replace(/\/$/, ""); } catch (e) {}
+  if (window.phosphobot_url) return String(window.phosphobot_url).replace(/\/$/, "");
+  try { var ls = localStorage.getItem("phosphobot_url"); if (ls) return String(ls).replace(/\/$/, ""); } catch (e) {}
+  return "http://192.168.100.103:8021";
 }
 function post(ctx, path, body) {
   var xhr = new XMLHttpRequest();
@@ -472,8 +489,10 @@ return "";
             </list>
             <l>
 function base(ctx) {
-  try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
-  catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
+  try { var v = ctx.variables.getVar("phosphobot_url"); if (v) return String(v).replace(/\/$/, ""); } catch (e) {}
+  if (window.phosphobot_url) return String(window.phosphobot_url).replace(/\/$/, "");
+  try { var ls = localStorage.getItem("phosphobot_url"); if (ls) return String(ls).replace(/\/$/, ""); } catch (e) {}
+  return "http://192.168.100.103:8021";
 }
 var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
 var xhr = new XMLHttpRequest();
@@ -514,8 +533,10 @@ return JSON.stringify(data);
           </list>
           <l>
 function base(ctx) {
-  try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
-  catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
+  try { var v = ctx.variables.getVar("phosphobot_url"); if (v) return String(v).replace(/\/$/, ""); } catch (e) {}
+  if (window.phosphobot_url) return String(window.phosphobot_url).replace(/\/$/, "");
+  try { var ls = localStorage.getItem("phosphobot_url"); if (ls) return String(ls).replace(/\/$/, ""); } catch (e) {}
+  return "http://192.168.100.103:8021";
 }
 var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
 var xhr = new XMLHttpRequest();
@@ -557,8 +578,10 @@ return "";
           </list>
           <l>
 function base(ctx) {
-  try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
-  catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
+  try { var v = ctx.variables.getVar("phosphobot_url"); if (v) return String(v).replace(/\/$/, ""); } catch (e) {}
+  if (window.phosphobot_url) return String(window.phosphobot_url).replace(/\/$/, "");
+  try { var ls = localStorage.getItem("phosphobot_url"); if (ls) return String(ls).replace(/\/$/, ""); } catch (e) {}
+  return "http://192.168.100.103:8021";
 }
 var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
 var xhr = new XMLHttpRequest();
@@ -596,8 +619,10 @@ return "";
           </list>
           <l>
 function base(ctx) {
-  try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
-  catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
+  try { var v = ctx.variables.getVar("phosphobot_url"); if (v) return String(v).replace(/\/$/, ""); } catch (e) {}
+  if (window.phosphobot_url) return String(window.phosphobot_url).replace(/\/$/, "");
+  try { var ls = localStorage.getItem("phosphobot_url"); if (ls) return String(ls).replace(/\/$/, ""); } catch (e) {}
+  return "http://192.168.100.103:8021";
 }
 var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
 var xhr = new XMLHttpRequest();
@@ -632,8 +657,10 @@ return "";
           </list>
           <l>
 function base(ctx) {
-  try { return String(ctx.variables.getVar("phosphobot_url") || window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
-  catch (e) { return String(window.phosphobot_url || "http://192.168.100.103:8021").replace(/\/$/, ""); }
+  try { var v = ctx.variables.getVar("phosphobot_url"); if (v) return String(v).replace(/\/$/, ""); } catch (e) {}
+  if (window.phosphobot_url) return String(window.phosphobot_url).replace(/\/$/, "");
+  try { var ls = localStorage.getItem("phosphobot_url"); if (ls) return String(ls).replace(/\/$/, ""); } catch (e) {}
+  return "http://192.168.100.103:8021";
 }
 var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
 if (rid === 1) {

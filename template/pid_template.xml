@@ -17,6 +17,7 @@
           </list>
           <l>
 window.phosphobot_url = String(url).replace(/\/$/, "");
+try { localStorage.setItem("phosphobot_url", window.phosphobot_url); } catch (e) {}
 try { this.variables.setVar("phosphobot_url", window.phosphobot_url); } catch (e) {}
 return "";
         </l>
@@ -44,7 +45,7 @@ return "";
               <l>joint</l>
             </list>
             <l>
-function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return String(v).replace(/\/$/,"");}catch(e){}if(window.phosphobot_url)return String(window.phosphobot_url).replace(/\/$/,"");try{var ls=localStorage.getItem("phosphobot_url");if(ls)return String(ls).replace(/\/$/,"");}catch(e){}return "http://192.168.100.103:8021";}
 var rid=Math.max(1,parseInt(robot,10)||1)-1,idx=Math.max(1,parseInt(joint,10)||1)-1,xhr=new XMLHttpRequest();
 xhr.open("POST",base(this)+"/joints/read?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({source:"robot",unit:"degrees"}));
 if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/joints/read HTTP "+xhr.status+": "+xhr.responseText);}
@@ -74,7 +75,7 @@ var data=JSON.parse(xhr.responseText||"{}"),angle=data.angles?data.angles[idx]:n
               <l>robot</l>
             </list>
             <l>
-function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return String(v).replace(/\/$/,"");}catch(e){}if(window.phosphobot_url)return String(window.phosphobot_url).replace(/\/$/,"");try{var ls=localStorage.getItem("phosphobot_url");if(ls)return String(ls).replace(/\/$/,"");}catch(e){}return "http://192.168.100.103:8021";}
 var rid=Math.max(1,parseInt(robot,10)||1)-1,xhr=new XMLHttpRequest();
 xhr.open("POST",base(this)+"/joints/read?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({source:"robot",unit:"degrees"}));
 if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/joints/read HTTP "+xhr.status+": "+xhr.responseText);}
@@ -99,7 +100,7 @@ return JSON.stringify((JSON.parse(xhr.responseText||"{}").angles)||[]);
           <block s="reportJSFunction">
             <list />
             <l>
-function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return String(v).replace(/\/$/,"");}catch(e){}if(window.phosphobot_url)return String(window.phosphobot_url).replace(/\/$/,"");try{var ls=localStorage.getItem("phosphobot_url");if(ls)return String(ls).replace(/\/$/,"");}catch(e){}return "http://192.168.100.103:8021";}
 var xhr=new XMLHttpRequest();xhr.open("GET",base(this)+"/status",false);xhr.send();
 if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/status HTTP "+xhr.status+": "+xhr.responseText);}
 try{this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} return xhr.responseText||"{}";
@@ -121,7 +122,7 @@ try{this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} re
           <block s="reportJSFunction">
             <list />
             <l>
-function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return String(v).replace(/\/$/,"");}catch(e){}if(window.phosphobot_url)return String(window.phosphobot_url).replace(/\/$/,"");try{var ls=localStorage.getItem("phosphobot_url");if(ls)return String(ls).replace(/\/$/,"");}catch(e){}return "http://192.168.100.103:8021";}
 var xhr=new XMLHttpRequest();xhr.open("GET",base(this)+"/status",false);xhr.send();
 if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/status HTTP "+xhr.status+": "+xhr.responseText);}
 var data=JSON.parse(xhr.responseText||"{}");try{this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} return data.robot_status?data.robot_status.length:((data.robots||[]).length);
@@ -150,7 +151,7 @@ var data=JSON.parse(xhr.responseText||"{}");try{this.variables.setVar("last_resp
             <l>angle</l>
           </list>
           <l>
-function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return String(v).replace(/\/$/,"");}catch(e){}if(window.phosphobot_url)return String(window.phosphobot_url).replace(/\/$/,"");try{var ls=localStorage.getItem("phosphobot_url");if(ls)return String(ls).replace(/\/$/,"");}catch(e){}return "http://192.168.100.103:8021";}
 function deg2mu(d){return d*4096/360+2048;}
 var rid=Math.max(1,parseInt(robot,10)||1)-1,idx=Math.max(1,parseInt(joint,10)||1)-1,target=Number(angle);
 var r=new XMLHttpRequest();r.open("POST",base(this)+"/joints/read?robot_id="+rid,false);r.setRequestHeader("Content-Type","application/json");r.send(JSON.stringify({source:"robot",unit:"motor_units"}));
@@ -253,7 +254,7 @@ try{this.variables.setVar("pid_error",error);this.variables.setVar("pid_integral
             <l>dt</l>
           </list>
           <l>
-function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return String(v).replace(/\/$/,"");}catch(e){}if(window.phosphobot_url)return String(window.phosphobot_url).replace(/\/$/,"");try{var ls=localStorage.getItem("phosphobot_url");if(ls)return String(ls).replace(/\/$/,"");}catch(e){}return "http://192.168.100.103:8021";}
 function post(ctx,path,body){var xhr=new XMLHttpRequest();xhr.open("POST",base(ctx)+path,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify(body||{}));if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error(path+" HTTP "+xhr.status+": "+xhr.responseText);}return JSON.parse(xhr.responseText||"{}");}
 function getNum(ctx,name,fallback){try{var v=ctx.variables.getVar(name);return Number(v==null||v===""?fallback:v);}catch(e){return Number(window[name]==null?fallback:window[name]);}}
 function deg2mu(d){return d*4096/360+2048;}
@@ -290,7 +291,7 @@ try{this.variables.setVar("current_angle",current);this.variables.setVar("target
             <l>robot</l>
           </list>
           <l>
-function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return String(v).replace(/\/$/,"");}catch(e){}if(window.phosphobot_url)return String(window.phosphobot_url).replace(/\/$/,"");try{var ls=localStorage.getItem("phosphobot_url");if(ls)return String(ls).replace(/\/$/,"");}catch(e){}return "http://192.168.100.103:8021";}
 var rid=Math.max(1,parseInt(robot,10)||1)-1,xhr=new XMLHttpRequest();
 xhr.open("POST",base(this)+"/move/init?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send("{}");
 if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/move/init HTTP "+xhr.status+": "+xhr.responseText);}try{this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} return "";
@@ -317,7 +318,7 @@ if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/move/init HTTP "+xhr
             <l>robot</l>
           </list>
           <l>
-function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return String(v).replace(/\/$/,"");}catch(e){}if(window.phosphobot_url)return String(window.phosphobot_url).replace(/\/$/,"");try{var ls=localStorage.getItem("phosphobot_url");if(ls)return String(ls).replace(/\/$/,"");}catch(e){}return "http://192.168.100.103:8021";}
 function post(ctx,path,body){var xhr=new XMLHttpRequest();xhr.open("POST",base(ctx)+path,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify(body||{}));if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error(path+" HTTP "+xhr.status+": "+xhr.responseText);}return JSON.parse(xhr.responseText||"{}");}
 var rid=Math.max(1,parseInt(robot,10)||1)-1;
 var read=post(this,"/joints/read?robot_id="+rid,{source:"robot",unit:"motor_units"}),result=post(this,"/joints/write?robot_id="+rid,{angles:read.angles||[],unit:"motor_units"});
@@ -345,7 +346,7 @@ try{this.variables.setVar("last_response",JSON.stringify(result));}catch(e){} re
               <l>robot</l>
             </list>
             <l>
-function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return String(v).replace(/\/$/,"");}catch(e){}if(window.phosphobot_url)return String(window.phosphobot_url).replace(/\/$/,"");try{var ls=localStorage.getItem("phosphobot_url");if(ls)return String(ls).replace(/\/$/,"");}catch(e){}return "http://192.168.100.103:8021";}
 var rid=Math.max(1,parseInt(robot,10)||1)-1,xhr=new XMLHttpRequest();
 xhr.open("POST",base(this)+"/end-effector/read?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send("{}");
 if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/end-effector/read HTTP "+xhr.status+": "+xhr.responseText);}
@@ -379,7 +380,7 @@ var data=JSON.parse(xhr.responseText||"{}");try{this.variables.setVar("last_resp
             <l>z</l>
           </list>
           <l>
-function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return String(v).replace(/\/$/,"");}catch(e){}if(window.phosphobot_url)return String(window.phosphobot_url).replace(/\/$/,"");try{var ls=localStorage.getItem("phosphobot_url");if(ls)return String(ls).replace(/\/$/,"");}catch(e){}return "http://192.168.100.103:8021";}
 var rid=Math.max(1,parseInt(robot,10)||1)-1,xhr=new XMLHttpRequest();
 xhr.open("POST",base(this)+"/move/absolute?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({x:Number(x),y:Number(y),z:Number(z)}));
 if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/move/absolute HTTP "+xhr.status+": "+xhr.responseText);}
@@ -415,7 +416,7 @@ try{this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} re
             <l>dz</l>
           </list>
           <l>
-function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return String(v).replace(/\/$/,"");}catch(e){}if(window.phosphobot_url)return String(window.phosphobot_url).replace(/\/$/,"");try{var ls=localStorage.getItem("phosphobot_url");if(ls)return String(ls).replace(/\/$/,"");}catch(e){}return "http://192.168.100.103:8021";}
 var rid=Math.max(1,parseInt(robot,10)||1)-1,xhr=new XMLHttpRequest();
 xhr.open("POST",base(this)+"/move/relative?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({x:Number(dx),y:Number(dy),z:Number(dz)}));
 if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/move/relative HTTP "+xhr.status+": "+xhr.responseText);}
@@ -447,7 +448,7 @@ try{this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} re
             <l>open</l>
           </list>
           <l>
-function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return String(v).replace(/\/$/,"");}catch(e){}if(window.phosphobot_url)return String(window.phosphobot_url).replace(/\/$/,"");try{var ls=localStorage.getItem("phosphobot_url");if(ls)return String(ls).replace(/\/$/,"");}catch(e){}return "http://192.168.100.103:8021";}
 var rid=Math.max(1,parseInt(robot,10)||1)-1,xhr=new XMLHttpRequest();
 xhr.open("POST",base(this)+"/move/relative?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({open:Math.max(0,Math.min(1,Number(open)))}));
 if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/move/relative HTTP "+xhr.status+": "+xhr.responseText);}
@@ -476,7 +477,7 @@ try{this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} re
             <l>robot</l>
           </list>
           <l>
-function base(ctx){try{return String(ctx.variables.getVar("phosphobot_url")||window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}catch(e){return String(window.phosphobot_url||"http://192.168.100.103:8021").replace(/\/$/,"");}}
+function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return String(v).replace(/\/$/,"");}catch(e){}if(window.phosphobot_url)return String(window.phosphobot_url).replace(/\/$/,"");try{var ls=localStorage.getItem("phosphobot_url");if(ls)return String(ls).replace(/\/$/,"");}catch(e){}return "http://192.168.100.103:8021";}
 var rid=Math.max(1,parseInt(robot,10)||1)-1;
 if(rid===1){var safe=[2039.0,870.7,3047.2,837.7,2045.0,2067.0];
 var xhr=new XMLHttpRequest();xhr.open("POST",base(this)+"/joints/write?robot_id=1",false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({angles:safe,unit:"motor_units"}));
