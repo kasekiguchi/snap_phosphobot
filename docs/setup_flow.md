@@ -117,7 +117,6 @@ phosphobot URLを [http://<Pi5のIPアドレス>:8021] にする
 ```
 
 例:
-<img width="726" height="266" alt="image" src="https://github.com/user-attachments/assets/e444ef5e-26c1-47ad-9c88-ecf7bb075d16" />
 
 ```text
 phosphobot URLを [http://127.0.0.1:8021] にする
@@ -132,6 +131,9 @@ phosphobot URLを [http://127.0.0.1:8021] にする
 ```text
 statusを読む
 ```
+
+変数に"status"を追加し、ちゃんと接続できるか確認します。
+<img width="726" height="266" alt="image" src="https://github.com/user-attachments/assets/e444ef5e-26c1-47ad-9c88-ecf7bb075d16" />
 
 `/status` の JSON 文字列をそのまま返します。
 
@@ -159,6 +161,19 @@ PIDで関節 [1] を目標角度 [0] へ一歩うごかす dt秒 [0.1]
 ```text
 ValueError: Robot configuration is not set. Run the calibration first.
 ```
+
+
+```text
+ホームに戻る
+```
+<img width="693" height="210" alt="image" src="https://github.com/user-attachments/assets/7cd7cac5-8218-4575-9011-e364e1c0d34d" />
+
+```text
+安全に脱力する
+```
+<img width="668" height="205" alt="image" src="https://github.com/user-attachments/assets/cbe3bc4a-e134-465e-a87e-8314ed2014c7" />
+
+上記を実行することで、リーダーが動けばOK！
 
 ## よくある確認ポイント
 
