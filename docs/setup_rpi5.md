@@ -30,7 +30,6 @@ uv pip install "lerobot[feetech]"
 
 ２回目以降ログインしたときは以下を実行する
 ```bash
-cd ~/lerobot
 source .venv/bin/activate
 ```
 
@@ -42,6 +41,7 @@ source .venv/bin/activate
 
 USBポート確認
 ```bash
+cd ~/lerobot
 lerobot-find-port
 ```
 
@@ -53,8 +53,10 @@ sudo chmod 666 /dev/ttyACM1
 
 キャリブレーション
 ```bash
-lerobot-calibrate --robot.type=so101_follower --robot.port=/dev/ttyACM1 --robot.id=follower_arm
-lerobot-calibrate --teleop.type=so101_leader --teleop.port=/dev/ttyACM0 --teleop.id=leader_arm
+lerobot-calibrate --robot.type=so101_follower --robot.port=/dev/ttyACM0 --robot.id=follower_arm
+```
+```bash
+lerobot-calibrate --teleop.type=so101_leader --teleop.port=/dev/ttyACM1 --teleop.id=leader_arm
 ```
 
 ### Teleop
@@ -66,7 +68,7 @@ sudo chmod 666 /dev/ttyACM1
 ```
 
 ```bash
-lerobot-teleoperate     --robot.type=so101_follower     --robot.port=/dev/ttyACM1     --robot.id=follower_arm     --teleop.type=so101_leader     --teleop.port=/dev/ttyACM0     --teleop.id=leader_arm
+lerobot-teleoperate --robot.type=so101_follower --robot.port=/dev/ttyACM0 --robot.id=follower_arm --teleop.type=so101_leader --teleop.port=/dev/ttyACM1 --teleop.id=leader_arm
 ```
 
 ## Phosphobot
