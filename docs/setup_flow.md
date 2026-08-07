@@ -4,7 +4,7 @@
 
 ## 全体像
 
-```text
+
 クライアントPCのブラウザ / Snap!
   ↓ http://<Pi5のIPアドレス>:8021
 CORSプロキシ
@@ -12,7 +12,7 @@ CORSプロキシ
 phosphobot API
   ↓ USB
 SO-100 / SO-101 ロボットアーム
-```
+
 
 phosphobot 本体は `8020` で動きます。Snap! はブラウザ上で動くため、直接 `8020` にアクセスするとブラウザのセキュリティ制限に当たることがあります。そのため、Snap! からは `8021` の CORS プロキシに接続します。
 
@@ -51,7 +51,7 @@ curl http://localhost:8020/status
 ```bash
 git clone  https://github.com/kasekiguchi/snap_phosphobot.git
 cd snap_phosphobot
-source ~/lerobot/.venv/bin/activate
+source .venv/bin/activate
 uv pip install flask requests
 ```
 
@@ -268,6 +268,11 @@ Snap! はブラウザ上で動きます。ブラウザには、別の機器や�
 curl http://localhost:8021/status
 curl http://<Pi5のIPアドレス>:8021/status
 ```
+
+### キャリブレーション
+
+ブラウザで[Phosphobot](http://127.0.0.1:8021)にアクセスしキャリブレーションする。
+ACM0が一つ目のロボットであることが多い。
 
 ### 授業中の接続先
 
