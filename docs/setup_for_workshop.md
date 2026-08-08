@@ -38,7 +38,7 @@ sudo chmod 666 /dev/ttyFollower
 3. follower キャリブレーション
  
 ```bash
-source .venv/bin/activate
+source ~/.venv/bin/activate
 cd lerobot
 lerobot-calibrate --robot.type=so101_follower --robot.port=/dev/ttyFollower --robot.id=follower_arm
 ```
@@ -60,13 +60,14 @@ Teleoperation用の1, 2を実施
 3. Phosphobot起動
 
 ```bash
-source .venv/bin/activate
+source ~/.venv/bin/activate
 phosphobot run
 ```
 
 4. CORSプロキシ起動
 
 ```bash
+source ~/.venv/bin/activate
 cd ~/snap_phosphobot
 git pull
 python3 proxy/cors_proxy.py
