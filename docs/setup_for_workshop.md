@@ -91,4 +91,11 @@ python3 proxy/cors_proxy.py
 
 8b. Snapの「読み込み」から、このリポジトリの[template/pid_template.xml](~/snap_phosphobot/template/pid_template.xml)を読み込む
 
-9b. 7 の画像状態を作り、ws.xml として保存する。 
+9b. 7 の画像状態を作り、「名前を付けて保存」　
+
+以下の設定をして保存
+
+名前：ws 
+場所：Computer
+
+10b. ブラウザをリロードして、9bで保存したファイルを読み込み元の状態に戻ることを確認する。
