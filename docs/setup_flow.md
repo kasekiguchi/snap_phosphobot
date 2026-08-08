@@ -60,6 +60,7 @@ uv pip install flask requests
 ```
 
 ```bash
+source ~/.venv/bin/activate
 cd ~/snap_phosphobot
 python3 proxy/cors_proxy.py
 ```
