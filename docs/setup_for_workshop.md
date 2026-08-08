@@ -69,6 +69,7 @@ phosphobot run
 
 ```bash
 cd ~/snap_phosphobot
+git pull
 python3 proxy/cors_proxy.py
 ```
 
