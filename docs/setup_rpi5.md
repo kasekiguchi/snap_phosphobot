@@ -71,8 +71,9 @@ sudo install -m 755 setudev /usr/local/bin/setudev
 
 ```bash
 cd ~/snap_phosphobot
-sudo setudev SAE70xxxx1 SAE70xxxx2
+sudo setudev <SAE70xxxx1> <SAE70xxxx2>
 ```
+<SAE70xxxx1> <SAE70xxxx2>の部分をシリアル番号に置き換える。
 
 - 1つ目の引数のシリアル → `/dev/ttyLeader`
 - 2つ目の引数のシリアル → `/dev/ttyFollower`
