@@ -28,14 +28,14 @@ git clone  https://github.com/kasekiguchi/snap_phosphobot.git
 ```bash
 uv python install 3.13
 uv venv --python 3.13
-source .venv/bin/activate
+source ~/.venv/bin/activate
 uv pip install torch torchvision --torch-backend=cpu
 uv pip install "lerobot[feetech]"
 ```
 
 ２回目以降ログインしたときは以下を実行する
 ```bash
-source .venv/bin/activate
+source ~/.venv/bin/activate
 ```
 
 ## LeRobot
