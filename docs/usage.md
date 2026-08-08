@@ -21,8 +21,8 @@ The default URL in the blocks is `http://127.0.0.1:8021` (browser running on the
 - `PIDで関節 [1] を目標角度 [0] へ一歩うごかす dt秒 [0.1]`: reads the joint, computes one PID step, and writes the next target.
 - `ホームに戻る`: calls `/move/init`.
 - `止まれ`: reads current joints and writes those same angles back. This is a hold-position stop, not a hardware emergency stop.
-- `脱力の安全角度を設定する ロボット [2] 角度 [-0.8, -103.5, 87.8, -106.4, -0.3, 1.7]`: stores the per-robot safe pose (6 joint angles in degrees) used by `安全に脱力する`. Accepts a Snap! list, a JSON array string (e.g. the output of `全関節角度を読む`), or comma-separated numbers. An empty input clears the setting and restores the built-in default. The value is kept per robot in `localStorage`, so it survives a page reload.
-- `安全に脱力する ロボット [2]`: moves to that robot's safe pose, waits, then turns the torque off. Uses the pose set by `脱力の安全角度を設定する`; if none is set, robot 2 uses the built-in default pose and other robots fall back to `/move/absolute`.
+- `脱力の安全角度を設定する ロボット [2] 角度 [-0.8, -103.5, 87.8, -106.4, -0.3, 1.7]`: stores the per-robot safe pose (6 joint angles in degrees) used by `安全に脱力する`. The `角度` slot takes any of: the `全関節角度を読む ロボット (n)` reporter dropped straight into it, a Snap! list, a JSON array string, or comma-separated numbers. An empty input clears the setting and restores the built-in default. A wrong count, or a `null` joint from an uncalibrated robot, raises a Japanese error naming the joint. The value is kept per robot in `localStorage`, so it survives a page reload.
+- `安全に脱力する ロボット [1]`: writes that robot's safe pose via `/joints/write`, waits 2 s, then turns the torque off via `/torque/toggle`. Uses the pose set by `脱力の安全角度を設定する` for that robot, or a shared built-in default if none is set. Same path for every robot.
 
 ## Variables Updated
 
