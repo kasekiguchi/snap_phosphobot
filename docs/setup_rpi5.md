@@ -37,6 +37,17 @@ source .venv/bin/activate
 
 [こちら](https://huggingface.co/docs/lerobot/so101)や[こちら](https://wiki.seeedstudio.com/lerobot_so100m/)を参考に組み立てる。
 
+### set udev
+
+アームに対して順番に次をおこなう。
+
+１．USB接続して、次を実行
+```bash
+udevadm info -a -n /dev/ttyACM1* | grep -m1 'ATTRS{serial}'
+```
+ttyACM* の番号は /devに見えているものを指定する。
+上記で表示される値"SAE***"をLeader,Follower毎にメモっておく
+
 ### Calibration
 
 USBポート確認
