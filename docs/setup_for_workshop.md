@@ -81,13 +81,13 @@ python3 proxy/cors_proxy.py
 
 6. [Snap](https://snap.berkeley.edu/snap/snap.html)を開く
 
-7. Snapの「読み込み」から、~/Downloads/ws.xml を読み込む。
+7. Snapの設定からJavaScript extensions を有効化する
+
+8. Snapの「読み込み」から、~/Downloads/ws.xml を読み込む。
 
 <img width="628" height="362" alt="image" src="https://github.com/user-attachments/assets/ab66a34d-599b-4a8d-a5e5-37bd2c1bc295" />
 
-### 7でws.xml存在しない場合は以下をする。
-
-7b. Snapの設定からJavaScript extensions を有効化する
+### 8でws.xmlが存在しない場合は以下をする。
 
 8b. Snapの「読み込み」から、このリポジトリの[template/pid_template.xml](~/snap_phosphobot/template/pid_template.xml)を読み込む
 
