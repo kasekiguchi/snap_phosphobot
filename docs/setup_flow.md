@@ -36,6 +36,7 @@ sudo chmod 666 /dev/ttyLeader /dev/ttyFollower
 Pi5 上で phosphobot API サーバーを起動します。phosphobotのインストールがまだの場合は[RPi5の設定](setup_rpi5.md)を先にやってください。
 
 ```bash
+source ~/.venv/bin/activate
 phosphobot run
 ```
 
@@ -54,7 +55,7 @@ curl http://localhost:8020/status
 ```bash
 git clone  https://github.com/kasekiguchi/snap_phosphobot.git
 cd snap_phosphobot
-source .venv/bin/activate
+source ~/.venv/bin/activate
 uv pip install flask requests
 ```
 
