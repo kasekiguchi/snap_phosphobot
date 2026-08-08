@@ -75,7 +75,7 @@ python3 proxy/cors_proxy.py
 
 5. キャリブレーション
 
-ブラウザで[Phosphobot](http://127.0.0.1:8021)にアクセスしCalibrationする。
+ブラウザで[Phosphobot](http://127.0.0.1:8020)にアクセスしCalibrationする。
 どちらのロボットかはUSBを抜いてみる or 「Control Robot」で動かしてみればわかる。
 （注：USBを抜き差ししたときは2のUSB Port 権限設定をやり直すこと）
 
