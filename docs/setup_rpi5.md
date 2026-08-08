@@ -19,6 +19,11 @@ lerobot
 git clone https://github.com/Seeed-Projects/lerobot.git ~/lerobot
 ```
 
+snap_phosphobot
+```bash
+git clone  https://github.com/kasekiguchi/snap_phosphobot.git
+```
+
 仮想環境構築 
 ```bash
 uv python install 3.13
@@ -53,15 +58,6 @@ udevadm info -a -n /dev/ttyACM1* | grep -m1 'ATTRS{serial}'
 ttyACM* の番号は /devに見えているものを指定する。
 上記で表示される値"SAE***"をLeader,Follower毎にメモっておく。
 
-2台つないだ状態でまとめて確認したい場合は次でもよい。
-
-```bash
-for d in /dev/ttyACM*; do
-  echo -n "$d: "
-  udevadm info -q property -n "$d" | grep -m1 '^ID_SERIAL_SHORT='
-done
-```
-
 #### ２．setudev で固定名を割り当てる
 
 このリポジトリの [`setudev`](../setudev) を Pi5 に置いてインストールする。
@@ -74,6 +70,7 @@ sudo install -m 755 setudev /usr/local/bin/setudev
 メモしたシリアル番号を **Leader、Follower の順** に渡して実行する。
 
 ```bash
+cd ~/snap_phosphobot
 sudo setudev SAE70xxxx1 SAE70xxxx2
 ```
 
