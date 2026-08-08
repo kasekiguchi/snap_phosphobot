@@ -170,13 +170,9 @@ ValueError: Robot configuration is not set. Run the calibration first.
 
 ```text
 ホームに戻る
-```
-<img width="693" height="210" alt="image" src="https://github.com/user-attachments/assets/7cd7cac5-8218-4575-9011-e364e1c0d34d" />
-
-```text
 安全に脱力する
 ```
-<img width="668" height="205" alt="image" src="https://github.com/user-attachments/assets/cbe3bc4a-e134-465e-a87e-8314ed2014c7" />
+<img width="657" height="283" alt="image" src="https://github.com/user-attachments/assets/27e4a26d-0c92-4684-8ae0-033205eec8f5" />
 
 上記を実行することで、リーダーが動けばOK！
 
