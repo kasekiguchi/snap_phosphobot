@@ -16,22 +16,23 @@
 
 1. Port 確認
 
+`setudev` で固定名を割り当て済みなので、`ttyACM*` の番号を調べる必要はない。
+
 ```bash
-ls /dev
+ls -l /dev/ttyLeader /dev/ttyFollower
 ```
 
-ロボットにつながるUSBを抜き差しし、上記コマンドの結果を比較することで各ロボットのdevポートを確認する。
-経験的に以下の組み合わせが多い
+* `/dev/ttyLeader` … leader（操作する側）
+* `/dev/ttyFollower` … follower（追従する側）
 
-/dev/ttyACM0 # follower
-
-/dev/ttyACM1 # leader 
+どちらも `ttyACM*` へのシンボリックリンクとして表示されればOK。
+表示されない場合はUSBの挿し直しか、[setup_rpi5.md の set udev](setup_rpi5.md) をやり直す。
 
 2. USB Port 権限設定(RW付与)
 
 ```bash
-sudo chmod 666 /dev/ttyACM0
-sudo chmod 666 /dev/ttyACM1
+sudo chmod 666 /dev/ttyLeader
+sudo chmod 666 /dev/ttyFollower
 ```
 
 3. follower キャリブレーション
@@ -39,20 +40,18 @@ sudo chmod 666 /dev/ttyACM1
 ```bash
 source .venv/bin/activate
 cd lerobot
-lerobot-calibrate --robot.type=so101_follower --robot.port=/dev/ttyACM0 --robot.id=follower_arm
+lerobot-calibrate --robot.type=so101_follower --robot.port=/dev/ttyFollower --robot.id=follower_arm
 ```
-ttyACM0が上記で確認したポートと合っていることを確認する。
 
 4.  leader キャリブレーション
 ```bash
-lerobot-calibrate --teleop.type=so101_leader --teleop.port=/dev/ttyACM1 --teleop.id=leader_arm
+lerobot-calibrate --teleop.type=so101_leader --teleop.port=/dev/ttyLeader --teleop.id=leader_arm
 ```
-ttyACM0が上記で確認したポートと合っていることを確認する。
 
 5. Teleop 確認
 
 ```bash
-lerobot-teleoperate --robot.type=so101_follower --robot.port=/dev/ttyACM0 --robot.id=follower_arm --teleop.type=so101_leader --teleop.port=/dev/ttyACM1 --teleop.id=leader_arm
+lerobot-teleoperate --robot.type=so101_follower --robot.port=/dev/ttyFollower --robot.id=follower_arm --teleop.type=so101_leader --teleop.port=/dev/ttyLeader --teleop.id=leader_arm
 ```
 ### Snap 用
 

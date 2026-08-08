@@ -157,9 +157,9 @@ var rid=Math.max(1,parseInt(robot,10)||1)-1,idx=Math.max(1,parseInt(joint,10)||1
 var r=new XMLHttpRequest();r.open("POST",base(this)+"/joints/read?robot_id="+rid,false);r.setRequestHeader("Content-Type","application/json");r.send(JSON.stringify({source:"robot",unit:"motor_units"}));
 if(r.status&lt;200||r.status&gt;=300){throw new Error("/joints/read HTTP "+r.status+": "+r.responseText);}
 var angles=(JSON.parse(r.responseText||"{}").angles||[]).map(function(a){return Math.round(Number(a));});angles[idx]=Math.round(deg2mu(target));
-if(angles.length&lt;6||angles.some(function(n){return !isFinite(n);})){throw new Error("関節角度を読めませんでした(null)。書き込みはfollower(ロボット2)で行ってください。");}
+if(angles.length&lt;6||angles.some(function(n){return !isFinite(n);})){throw new Error("関節角度を読めませんでした(null)。キャリブレーションが済んでいるか、ロボット番号が合っているか確認してください。");}
 var xhr=new XMLHttpRequest();xhr.open("POST",base(this)+"/joints/write?robot_id="+rid,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify({angles:angles,unit:"motor_units"}));
-if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/joints/write HTTP "+xhr.status+" (robot_id="+rid+"): "+xhr.responseText+" ※書き込みはfollower(ロボット2)のみ可");}
+if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/joints/write HTTP "+xhr.status+" (robot_id="+rid+"): "+xhr.responseText);}
 try{this.variables.setVar("target_angle",target);this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} return "";
     </l>
         </block>
@@ -265,7 +265,7 @@ var current=!isFinite(angles[idx])?0:(angles[idx]-2048)*360/4096;
 var step=Math.max(0.001,Number(dt)||0.1),error=Number(target)-current,p=getNum(this,"pid_p",1),i=getNum(this,"pid_i",0),d=getNum(this,"pid_d",0);
 window.pid_integral=Number(window.pid_integral||0)+error*step;var derivative=(error-Number(window.pid_last_error||0))/step;window.pid_last_error=error;
 var next=current+(p*error+i*window.pid_integral+d*derivative);
-angles[idx]=Math.round(deg2mu(next));if(angles.length&lt;6||angles.some(function(n){return !isFinite(n);})){throw new Error("関節角度を読めませんでした(null)。PID制御はfollower(ロボット2)で行ってください。");}
+angles[idx]=Math.round(deg2mu(next));if(angles.length&lt;6||angles.some(function(n){return !isFinite(n);})){throw new Error("関節角度を読めませんでした(null)。キャリブレーションが済んでいるか、ロボット番号が合っているか確認してください。");}
 var result=post(this,"/joints/write?robot_id="+rid,{angles:angles,unit:"motor_units"});
 try{this.variables.setVar("current_angle",current);this.variables.setVar("target_angle",Number(target));this.variables.setVar("pid_error",error);this.variables.setVar("pid_integral",window.pid_integral);this.variables.setVar("pid_derivative",derivative);this.variables.setVar("last_response",JSON.stringify(result));}catch(e){} return "";
     </l>
@@ -306,7 +306,7 @@ if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error("/move/init HTTP "+xhr
     </script>
   </block-definition>
   <block-definition s="止まれ ロボット %&apos;robot&apos;" type="command" category="phosphobot">
-    <comment w="240" collapsed="false">現在角度を読み、同じ角度を書き戻す保持停止。ハードウェア非常停止ではありません。writeはfollower(ロボット2)のみ。</comment>
+    <comment w="240" collapsed="false">現在角度を読み、同じ角度を書き戻す保持停止。ハードウェア非常停止ではありません。</comment>
     <header></header>
     <code></code>
     <translations></translations>
@@ -324,7 +324,7 @@ function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return 
 function post(ctx,path,body){var xhr=new XMLHttpRequest();xhr.open("POST",base(ctx)+path,false);xhr.setRequestHeader("Content-Type","application/json");xhr.send(JSON.stringify(body||{}));if(xhr.status&lt;200||xhr.status&gt;=300){throw new Error(path+" HTTP "+xhr.status+": "+xhr.responseText);}return JSON.parse(xhr.responseText||"{}");}
 var rid=Math.max(1,parseInt(robot,10)||1)-1;
 var read=post(this,"/joints/read?robot_id="+rid,{source:"robot",unit:"motor_units"}),angles=(read.angles||[]).map(function(a){return Math.round(Number(a));});
-if(angles.length&lt;6||angles.some(function(n){return !isFinite(n);})){throw new Error("関節角度を読めませんでした(null)。停止はfollower(ロボット2)で行ってください。");}
+if(angles.length&lt;6||angles.some(function(n){return !isFinite(n);})){throw new Error("関節角度を読めませんでした(null)。キャリブレーションが済んでいるか、ロボット番号が合っているか確認してください。");}
 var result=post(this,"/joints/write?robot_id="+rid,{angles:angles,unit:"motor_units"});
 try{this.variables.setVar("last_response",JSON.stringify(result));}catch(e){} return "";
     </l>

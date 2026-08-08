@@ -39,16 +39,66 @@ source .venv/bin/activate
 
 ### set udev
 
-アームに対して順番に次をおこなう。
+`/dev/ttyACM*` の番号は挿す順番やタイミングで入れ替わるので、シリアル番号に固定名を割り当てておく。
+設定後は Leader が `/dev/ttyLeader`、Follower が `/dev/ttyFollower` で常に参照できる。
 
-１．USB接続して、次を実行
+#### １．シリアル番号を調べる
+
+アームに対して順番に次をおこなう。USB接続して、次を実行する。
+
 ```bash
 udevadm info -a -n /dev/ttyACM1* | grep -m1 'ATTRS{serial}'
 ```
+
 ttyACM* の番号は /devに見えているものを指定する。
-上記で表示される値"SAE***"をLeader,Follower毎にメモっておく
+上記で表示される値"SAE***"をLeader,Follower毎にメモっておく。
+
+2台つないだ状態でまとめて確認したい場合は次でもよい。
+
+```bash
+for d in /dev/ttyACM*; do
+  echo -n "$d: "
+  udevadm info -q property -n "$d" | grep -m1 '^ID_SERIAL_SHORT='
+done
+```
+
+#### ２．setudev で固定名を割り当てる
+
+このリポジトリの [`setudev`](../setudev) を Pi5 に置いてインストールする。
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kasekiguchi/snap_phosphobot/main/setudev -o setudev
+sudo install -m 755 setudev /usr/local/bin/setudev
+```
+
+メモしたシリアル番号を **Leader、Follower の順** に渡して実行する。
+
+```bash
+sudo setudev SAE70xxxx1 SAE70xxxx2
+```
+
+- 1つ目の引数のシリアル → `/dev/ttyLeader`
+- 2つ目の引数のシリアル → `/dev/ttyFollower`
+
+`/etc/udev/rules.d/99-fixed-usb-serial.rules` を書き出し、udev ルールの再読み込みまで自動で行う。
+指定したシリアルが接続されていないときは警告が出るので、打ち間違いに気づける。
+
+#### ３．確認
+
+```bash
+ls -l /dev/ttyLeader /dev/ttyFollower
+```
+
+`/dev/ttyLeader -> ttyACM1` のように、実体の `ttyACM*` へのシンボリックリンクが表示されればOK。
+USBを挿し直して番号が入れ替わっても、名前の方は追従する。
+
+> **メモ**: `setudev` は VID:PID が `1a86:55d3` の機器を対象にしている。
+> 別のUSBシリアル変換チップを使っている場合は、`udevadm info -a -n /dev/ttyACM0 | grep -m1 idVendor` などで確認し、
+> スクリプト冒頭の `VID` / `PID` を書き換える。
 
 ### Calibration
+
+以降は `/dev/ttyACM0`、`/dev/ttyACM1` の代わりに `/dev/ttyFollower`、`/dev/ttyLeader` を使う。
 
 USBポート確認
 ```bash
@@ -58,28 +108,28 @@ lerobot-find-port
 
 USBポート権限設定
 ```bash
-sudo chmod 666 /dev/ttyACM0
-sudo chmod 666 /dev/ttyACM1
+sudo chmod 666 /dev/ttyFollower
+sudo chmod 666 /dev/ttyLeader
 ```
 
 キャリブレーション
 ```bash
-lerobot-calibrate --robot.type=so101_follower --robot.port=/dev/ttyACM0 --robot.id=follower_arm
+lerobot-calibrate --robot.type=so101_follower --robot.port=/dev/ttyFollower --robot.id=follower_arm
 ```
 ```bash
-lerobot-calibrate --teleop.type=so101_leader --teleop.port=/dev/ttyACM1 --teleop.id=leader_arm
+lerobot-calibrate --teleop.type=so101_leader --teleop.port=/dev/ttyLeader --teleop.id=leader_arm
 ```
 
 ### Teleop
 
 USBポート権限設定
 ```bash
-sudo chmod 666 /dev/ttyACM0
-sudo chmod 666 /dev/ttyACM1
+sudo chmod 666 /dev/ttyFollower
+sudo chmod 666 /dev/ttyLeader
 ```
 
 ```bash
-lerobot-teleoperate --robot.type=so101_follower --robot.port=/dev/ttyACM0 --robot.id=follower_arm --teleop.type=so101_leader --teleop.port=/dev/ttyACM1 --teleop.id=leader_arm
+lerobot-teleoperate --robot.type=so101_follower --robot.port=/dev/ttyFollower --robot.id=follower_arm --teleop.type=so101_leader --teleop.port=/dev/ttyLeader --teleop.id=leader_arm
 ```
 
 ## Phosphobot
