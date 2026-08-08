@@ -25,8 +25,11 @@ SO-100 / SO-101 を Pi5 に USB 接続します。
 接続後、必要に応じて USB デバイスの権限を変更します。
 
 ```bash
-sudo chmod 666 /dev/ttyACM*
+sudo chmod 666 /dev/ttyLeader /dev/ttyFollower
 ```
+
+`/dev/ttyLeader`・`/dev/ttyFollower` は [setup_rpi5.md の set udev](setup_rpi5.md) で `setudev` を実行すると作られる固定名です。
+未設定の場合は `sudo chmod 666 /dev/ttyACM*` としてください。
 
 ### 2. phosphobot を起動する
 
@@ -254,11 +257,12 @@ ValueError: Robot configuration is not set. Run the calibration first.
 2. ダッシュボード `http://<Pi5のIP>:8020/` を開き、対象アームの Calibration ウィザードを実行（または `POST /calibrate?robot_id=1` の対話式）。
 3. 再度 `robot/config` で `config` が入っていれば OK。Snap! の「目標角度にうごかす ロボット 2」を再実行する。
 
-書き込み（`/joints/write`）が可能なのは follower（ロボット 2 / robot_id=1）のみです。
+書き込み（`/joints/write`）は leader（ロボット 1）・follower（ロボット 2）のどちらでも可能です。
+うまくいかない場合は、そのロボットのキャリブレーションが済んでいるかを先に確認してください。
 
 ### ロボットが 0 台と表示される
 
-USB 接続、`/dev/ttyACM*` の権限、phosphobot の起動状態を確認してください。
+USB 接続、`/dev/ttyLeader`・`/dev/ttyFollower`（未設定なら `/dev/ttyACM*`）の権限、phosphobot の起動状態を確認してください。
 
 
 
@@ -342,6 +346,6 @@ curl http://localhost:8020/status が返らない
 
 
 ```bash
-sudo chmod 666 /dev/ttyACM*
+sudo chmod 666 /dev/ttyLeader /dev/ttyFollower
 curl http://localhost:8020/status
 ```

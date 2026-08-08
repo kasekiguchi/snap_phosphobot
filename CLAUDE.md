@@ -20,6 +20,10 @@ SO-101ロボットアームを中学生向け体験教室で使えるように�
 - Pi5ホスト: 環境変数 `PI5_HOST`（例: `export PI5_HOST=192.168.1.xx`）
 - phosphobotポート: 8020（API直接）/ 8021（CORSプロキシ経由、Snap!はこちらを使う）
 - ベースURL: `http://$PI5_HOST:8021`（Snap!から）
+  - ブロックのデフォルトは `http://127.0.0.1:8021`（Pi5上のブラウザでSnap!を開く前提）。
+    別PCから使う場合は `phosphobot URLを ... にする` でPi5のアドレスに変える
+- USBシリアル: `/dev/ttyLeader`（ロボット1）/ `/dev/ttyFollower`（ロボット2）
+  — `setudev <leader_serial> <follower_serial>` で固定名を割り当て済み
 - APIドキュメント: `http://$PI5_HOST:8020/docs`（Swagger UI）
 
 ## ロボット構成
@@ -28,13 +32,15 @@ SO-101ロボットアームを中学生向け体験教室で使えるように�
 
 | ブロック上の番号 | robot_id | 名前 | 役割 |
 |---|---|---|---|
-| ロボット 1 | 0 | so-100 | **leader（読み取り専用）** — joints/writeは不可 |
-| ロボット 2 | 1 | so-100 | **follower（読み書き可能）** — 制御対象 |
+| ロボット 1 | 0 | so-100 | **leader** — teleopの操作側。`/dev/ttyLeader` |
+| ロボット 2 | 1 | so-100 | **follower** — 主な制御対象。`/dev/ttyFollower` |
 
-- `関節角度を読む`、`全関節角度を読む`、`手先の位置を読む` → 両方のロボットで使用可能
-- `目標角度にうごかす`（joints/write）、`PIDで...一歩うごかす`、`止まれ` → **ロボット 2 のみ**（joints/writeがleaderで使えない）
-- `手先を絶対位置へ動かす`、`手先を相対移動する`、`グリッパー` → **両方のロボットで使用可能**（move/absolute, move/relativeはleaderでも動く）
+- **読み書きとも、どちらのロボットでも可能**（`joints/write` は leader でも通る）
+- `関節角度を読む`、`全関節角度を読む`、`手先の位置を読む` → 両方
+- `目標角度にうごかす`（joints/write）、`PIDで...一歩うごかす`、`止まれ`、`安全に脱力する` → 両方
+- `手先を絶対位置へ動かす`、`手先を相対移動する`、`グリッパー` → 両方（move/absolute, move/relative）
 - `ホームに戻る` → ロボット番号に関わらず**両方のアームが同時にホームに戻る**
+- `joints/read` が `null` を返すときは、そのロボットのキャリブレーションが済んでいない可能性が高い
 
 ## phosphobot API の注意点
 
@@ -108,6 +114,8 @@ PID教材に最低限必要なブロック:
 | `手先を絶対位置へ動かす ロボット (n) x y z` | 絶対位置指定（cm） | POST /move/absolute |
 | `手先を相対移動する ロボット (n) dx dy dz` | 差分移動（cm） | POST /move/relative |
 | `グリッパー ロボット (n) 開閉 (0-1)` | グリッパー開閉 | POST /move/relative |
+| `脱力の安全角度を設定する ロボット (n) 角度 (…)` | 脱力前の安全姿勢をロボットごとに保存（度・6関節） | — (localStorage) |
+| `安全に脱力する ロボット (n)` | 安全姿勢へ移動してトルクOFF | POST /joints/write + /torque/toggle |
 
 Snap!のHTTP実装方針:
 
@@ -166,6 +174,7 @@ if __name__ == "__main__":
 ```
 snap_phosphobot/
 ├── CLAUDE.md
+├── setudev                    # ttyLeader/ttyFollower を固定するudevルール生成（Pi5上でsudo実行）
 ├── docs/
 │   └── api_spec.json          # phosphobot APIエンドポイント一覧（自動生成）
 ├── blocks/
