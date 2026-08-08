@@ -138,7 +138,7 @@ statusを読む
 ```
 
 変数に"status"を追加し、ちゃんと接続できるか確認します。
-<img width="726" height="266" alt="image" src="https://github.com/user-attachments/assets/e444ef5e-26c1-47ad-9c88-ecf7bb075d16" />
+<img width="664" height="247" alt="image" src="https://github.com/user-attachments/assets/4b50e6a5-dc9c-4124-82ce-fe6fbeefe643" />
 
 `/status` の JSON 文字列をそのまま返します。
 
