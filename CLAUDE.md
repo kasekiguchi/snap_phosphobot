@@ -114,6 +114,8 @@ PID教材に最低限必要なブロック:
 | `手先を絶対位置へ動かす ロボット (n) x y z` | 絶対位置指定（cm） | POST /move/absolute |
 | `手先を相対移動する ロボット (n) dx dy dz` | 差分移動（cm） | POST /move/relative |
 | `グリッパー ロボット (n) 開閉 (0-1)` | グリッパー開閉 | POST /move/relative |
+| `関節 (n) の回転方向を (+/-) にする` | 手動操作の向き設定（関節ごと） | — (localStorage) |
+| `ロボット (n) の関節 (n) を (t) 秒動かす` | 一定速度30度/秒でt秒動かす（手動操作・ON-OFF制御用） | POST /joints/read + /joints/write |
 | `脱力の安全角度を設定する ロボット (n) 角度 (…)` | 脱力前の安全姿勢をロボットごとに保存（度・6関節） | — (localStorage) |
 | `安全に脱力する ロボット (n)` | 安全姿勢へ移動してトルクOFF | POST /joints/write + /torque/toggle |
 

@@ -466,6 +466,95 @@ try{this.variables.setVar("last_response",xhr.responseText||"{}");}catch(e){} re
       </block>
     </script>
   </block-definition>
+  <block-definition s="関節 %&apos;joint&apos; の回転方向を %&apos;dir&apos; にする" type="command" category="phosphobot">
+    <comment w="320" collapsed="false">このあとの「〜秒動かす」で、その関節がどちら向きに回るかを決めます。+ は角度が増える向き、- は減る向き（+1 / -1 でもOK）。関節ごとに覚えているので、キーごとに向きを変えられます。初期値は + です。</comment>
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs>
+      <input type="%n">1</input>
+      <input type="%s">+</input>
+    </inputs>
+    <script>
+      <block s="doRun">
+        <block s="reportJSFunction">
+          <list>
+            <l>joint</l>
+            <l>dir</l>
+          </list>
+          <l>
+var jn=parseInt(joint,10);
+if(!(jn&gt;=1&amp;&amp;jn&lt;=6)){throw new Error("関節番号は 1〜6 で指定してください。");}
+var s=String(dir).trim(),d;
+if(s==="+"||s==="+1"||s==="1"){d=1;}else if(s==="-"||s==="-1"){d=-1;}else{throw new Error("回転方向は + か - で指定してください（+1 / -1 でもOK）。受け取った値: "+s);}
+window["joint_dir_"+jn]=d;try{localStorage.setItem("joint_dir_"+jn,String(d));}catch(e){}
+try{this.variables.setVar("joint_dir",d);}catch(e){} return "";
+          </l>
+        </block>
+        <list>
+          <block var="joint" />
+          <block var="dir" />
+        </list>
+      </block>
+    </script>
+  </block-definition>
+  <block-definition s="ロボット %&apos;robot&apos; の関節 %&apos;joint&apos; を %&apos;seconds&apos; 秒動かす" type="command" category="phosphobot">
+    <comment w="320" collapsed="false">「関節 (n) の回転方向を … にする」で決めた向きへ、指定した秒数だけ一定速度（30度/秒）で動かします。0.1秒なら約3度、1秒なら約30度動きます。動かせるのは1回あたり5秒までです。</comment>
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs>
+      <input type="%n">1</input>
+      <input type="%n">1</input>
+      <input type="%n">0.2</input>
+    </inputs>
+    <script>
+      <block s="doRun">
+        <block s="reportJSFunction">
+          <list>
+            <l>robot</l>
+            <l>joint</l>
+            <l>seconds</l>
+          </list>
+          <l>
+function base(ctx){try{var v=ctx.variables.getVar("phosphobot_url");if(v)return String(v).replace(/\/$/,"");}catch(e){}if(window.phosphobot_url)return String(window.phosphobot_url).replace(/\/$/,"");try{var ls=localStorage.getItem("phosphobot_url");if(ls)return String(ls).replace(/\/$/,"");}catch(e){}return "http://127.0.0.1:8021";}
+function deg2mu(d){return Math.round(Number(d)*4096/360+2048);}
+function mu2deg(m){return (Number(m)-2048)*360/4096;}
+var SPEED_DPS=30,STEP_MS=50,LIMIT_DEG=175,MAX_SEC=5;
+var rid=Math.max(1,parseInt(robot,10)||1)-1,jn=parseInt(joint,10);
+if(!(jn&gt;=1&amp;&amp;jn&lt;=6)){throw new Error("関節番号は 1〜6 で指定してください。");}
+var idx=jn-1,sec=Number(seconds);
+if(!isFinite(sec)||sec&lt;0){throw new Error("秒数は0以上の数で指定してください。");}
+sec=Math.min(sec,MAX_SEC);
+var d=window["joint_dir_"+jn];
+if(d===undefined||d===null){try{var saved=localStorage.getItem("joint_dir_"+jn);if(saved!==null)d=Number(saved);}catch(e){}}
+d=(Number(d)&lt;0)?-1:1;
+var r=new XMLHttpRequest();r.open("POST",base(this)+"/joints/read?robot_id="+rid,false);r.setRequestHeader("Content-Type","application/json");r.send(JSON.stringify({source:"robot",unit:"motor_units"}));
+if(r.status&lt;200||r.status&gt;=300){throw new Error("/joints/read HTTP "+r.status+": "+r.responseText);}
+var angles=(JSON.parse(r.responseText||"{}").angles||[]).map(function(a){return Math.round(Number(a));});
+if(angles.length&lt;6||angles.some(function(n){return !isFinite(n);})){throw new Error("関節角度を読めませんでした(null)。キャリブレーションが済んでいるか、ロボット番号が合っているか確認してください。");}
+var startDeg=mu2deg(angles[idx]),t0=Date.now();
+while(true){
+var t=Math.min((Date.now()-t0+STEP_MS)/1000,sec),target=startDeg+d*SPEED_DPS*t;
+if(target&gt;LIMIT_DEG){target=LIMIT_DEG;} if(target&lt;-LIMIT_DEG){target=-LIMIT_DEG;}
+angles[idx]=deg2mu(target);
+var w=new XMLHttpRequest();w.open("POST",base(this)+"/joints/write?robot_id="+rid,false);w.setRequestHeader("Content-Type","application/json");w.send(JSON.stringify({angles:angles,unit:"motor_units"}));
+if(w.status&lt;200||w.status&gt;=300){throw new Error("/joints/write HTTP "+w.status+" (robot_id="+rid+"): "+w.responseText);}
+try{this.variables.setVar("target_angle",target);this.variables.setVar("last_response",w.responseText||"{}");}catch(e){}
+if(t&gt;=sec){break;}
+var until=Math.min(Date.now()+STEP_MS,t0+sec*1000);while(Date.now()&lt;until){}
+}
+return "";
+          </l>
+        </block>
+        <list>
+          <block var="robot" />
+          <block var="joint" />
+          <block var="seconds" />
+        </list>
+      </block>
+    </script>
+  </block-definition>
   <block-definition s="脱力の安全角度を設定する ロボット %&apos;robot&apos; 角度 %&apos;angles&apos;" type="command" category="phosphobot">
     <comment w="320" collapsed="false">「安全に脱力する」で使う安全角度（6関節ぶん・度）をロボットごとに設定します。角度の欄には「全関節角度を読む ロボット (n)」ブロックをそのままはめ込めます（カンマ区切りの数値やリストでもOK）。空にすると設定を消して初期値に戻ります。</comment>
     <header></header>
