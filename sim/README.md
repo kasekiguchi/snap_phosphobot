@@ -7,6 +7,9 @@ Snap! のカスタムブロックを動かして確認するための一式で�
 
 Windows 11 + WSL2 + Ubuntu 24.04 で確認しています。
 
+**手順だけ知りたい場合は [quickstart.md](quickstart.md) を見てください。**
+こちらは各スクリプトの中身と、実機との違いの説明です。
+
 ## 1. 環境構築（初回のみ）
 
 WSL の Ubuntu で:
@@ -45,7 +48,7 @@ Windows 側のブラウザからでも、WSL2 のポートは `127.0.0.1` で見
 ## 4. 3D で見る
 
 ```bash
-$HOME/pbsim/bin/python sim/viewer.py
+bash sim/view.sh          # 窓を出す（閉じるのは bash sim/view.sh stop）
 ```
 
 WSLg の窓が開き、Snap! から動かした通りにアームが動きます（20Hz で関節角度を読んで反映）。

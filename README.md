@@ -3,10 +3,12 @@
 Snap! のカスタムブロックから phosphobot API を呼び出し、SO-100 / SO-101 ロボットアームを操作するための教材用リポジトリです。
 
 ## まず読む資料
+
 - [docs/setup_rpi5.md](docs/setup_rpi5.md): RPi5の環境構築
 - [docs/setup_flow.md](docs/setup_flow.md): Pi5 側の起動手順、Snap! 側の読み込み手順、`8020` と `8021` の構成説明
 - [docs/usage.md](docs/usage.md): Snap! カスタムブロックの一覧と使い方
-- [sim/README.md](sim/README.md): 実機がないときに WSL2 + Ubuntu のシミュレーションで動かす手順
+- [sim/quickstart.md](sim/quickstart.md): 実機がないとき、WSL2 + Ubuntu のシミュレーションで試す手順
+- [sim/README.md](sim/README.md): シミュレーション環境の構成と、実機との違い
 
 ## 主なファイル
 
