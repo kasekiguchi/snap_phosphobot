@@ -89,7 +89,7 @@ python3 proxy/cors_proxy.py
 
 ### 8でws.xmlが存在しない場合は以下をする。
 
-8b. Snapの「読み込み」から、このリポジトリの[template/pid_template.xml](~/snap_phosphobot/template/pid_template.xml)を読み込む
+8b. Snapの「読み込み」から、このリポジトリの[template/GiC_template.xml](~/snap_phosphobot/template/GiC_template.xml)を読み込む
 
 9b. 7 の画像状態を作り、「名前を付けて保存」　
 

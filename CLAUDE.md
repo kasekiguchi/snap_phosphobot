@@ -128,7 +128,7 @@ Snap!のHTTP実装方針:
 ### Step 4: Snap!テンプレートXMLの生成
 
 - カスタムブロック定義を含むSnap!プロジェクト（.xml）を生成
-- `template/pid_template.xml`として保存
+- `template/GiC_template.xml`として保存
 - 配布方法: snap.berkeley.eduを開いて「Import」でXMLを読み込む
 
 ### Step 5: 動作確認
@@ -182,7 +182,7 @@ snap_phosphobot/
 ├── blocks/
 │   └── pid_blocks.xml         # Snap!カスタムブロック定義
 ├── template/
-│   └── pid_template.xml       # 授業で配布するSnap!プロジェクト
+│   └── GiC_template.xml       # 授業で配布するSnap!プロジェクト
 └── proxy/
     └── cors_proxy.py          # CORSプロキシ（必要な場合）
 ```

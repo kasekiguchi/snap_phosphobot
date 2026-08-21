@@ -104,7 +104,7 @@ Snap! の歯車アイコンから `JavaScript extensions` を有効にします�
 Snap! のファイルメニューから `Import...` を選び、次の XML を読み込みます。
 
 ```text
-template/pid_template.xml
+template/GiC_template.xml
 ```
 
 ブロック定義だけを読み込む場合は、次のファイルも使えます。
