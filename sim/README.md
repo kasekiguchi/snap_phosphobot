@@ -36,7 +36,7 @@ bash sim/run.sh
 
 ## 3. Snap! からつなぐ
 
-ブラウザで Snap! を開き、いつもどおり `template/pid_template.xml` を読み込んで:
+ブラウザで Snap! を開き、いつもどおり `template/GiC_template.xml` を読み込んで:
 
 ```text
 phosphobot URLを [http://127.0.0.1:8021] にする
@@ -70,7 +70,7 @@ Node で実行するための小さなランタイムです。ブロックのコ
 
 ```bash
 cd sim/harness
-python3 extract_blocks.py ../../template/pid_template.xml ./blocks.json
+python3 extract_blocks.py ../../template/GiC_template.xml ./blocks.json
 PB_URL=http://127.0.0.1:8021 node test_blocks.js ./blocks.json
 ```
 

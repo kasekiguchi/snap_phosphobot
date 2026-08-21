@@ -4,7 +4,7 @@
 
 1. Open <https://snap.berkeley.edu/snap/snap.html>.
 2. Enable JavaScript extensions in Snap! settings.
-3. Import `template/pid_template.xml` or `blocks/pid_blocks.xml`.
+3. Import `template/GiC_template.xml` or `blocks/pid_blocks.xml`.
 4. Run `phosphobot URLを [http://127.0.0.1:8021] にする`.
 
 The default URL in the blocks is `http://127.0.0.1:8021` (browser running on the Pi5 itself, via `proxy/cors_proxy.py`). From another PC, replace `127.0.0.1` with the Pi5 address, e.g. `http://192.168.100.103:8021`.

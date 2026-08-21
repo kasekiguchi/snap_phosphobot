@@ -12,7 +12,7 @@ Snap! のカスタムブロックから phosphobot API を呼び出し、SO-100 
 
 ## 主なファイル
 
-- [template/pid_template.xml](template/pid_template.xml): Snap! に読み込むテンプレート XML
+- [template/GiC_template.xml](template/GiC_template.xml): Snap! に読み込むテンプレート XML
 - [blocks/pid_blocks.xml](blocks/pid_blocks.xml): Snap! カスタムブロック定義
 - [proxy/cors_proxy.py](proxy/cors_proxy.py): Snap! から phosphobot に接続するための CORS プロキシ
 

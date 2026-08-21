@@ -47,7 +47,7 @@ WSLg のウィンドウが開き、仮想の SO-100 が表示されます。
 1. ブラウザで <https://snap.berkeley.edu/snap/snap.html> を開く
 2. 歯車アイコン → `JavaScript extensions` を有効化
 3. ファイルメニュー → `Import...` で [`template/test2.xml`](../template/test2.xml) を読み込む
-   （ブロックだけ欲しいときは [`template/pid_template.xml`](../template/pid_template.xml)）
+   （ブロックだけ欲しいときは [`template/GiC_template.xml`](../template/GiC_template.xml)）
 4. 次のブロックを実行して接続先を決める
 
    ```text
