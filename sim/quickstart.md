@@ -46,7 +46,7 @@ WSLg のウィンドウが開き、仮想の SO-100 が表示されます。
 
 1. ブラウザで <https://snap.berkeley.edu/snap/snap.html> を開く
 2. 歯車アイコン → `JavaScript extensions` を有効化
-3. ファイルメニュー → `Import...` で [`template/test2.xml`](../template/test2.xml) を読み込む
+3. ファイルメニュー → `Import...` で [`template/test0.xml`](../template/test0.xml) を読み込む
    （ブロックだけ欲しいときは [`template/GiC_template.xml`](../template/GiC_template.xml)）
 4. 次のブロックを実行して接続先を決める
 
@@ -72,20 +72,30 @@ statusを読む                          … 接続確認
 ロボット [1] の関節 [1] を [3] 秒動かす   … 戻ってくる
 ```
 
-次に `test2.xml` に入っている ON-OFF 制御を緑の旗で実行します。
+次に `test0.xml` に入っている ON-OFF 制御を緑の旗で実行します。
 
 ```text
 緑の旗が押されたとき
+  [leader] を [1] にする
+  [follower] を [2] にする
   [目標角度] を [0] にする
   ずっと
-    [関節1] を (関節角度を読む ロボット [1] 関節番号 [1]) にする
+    [関節1] を (関節角度を読む ロボット (follower) 関節番号 [1]) にする
     もし <(関節1) < (目標角度)> なら
       関節 [1] の回転方向を [+] にする
-      ロボット [1] の関節 [1] を [0.4] 秒動かす
+      ロボット (follower) の関節 [1] を [0.4] 秒動かす
     でなければ もし <(関節1) > (目標角度)> なら
       関節 [1] の回転方向を [-] にする
-      ロボット [1] の関節 [1] を [0.4] 秒動かす
+      ロボット (follower) の関節 [1] を [0.4] 秒動かす
 ```
+
+ロボット番号は `leader` / `follower` の変数で持っているので、入れ替えるときは
+`にする` の値を直すだけで済みます。
+
+> シミュレーションのロボットは1台（`robot_id=0` = ブロックの「ロボット 1」）だけなので、
+> `follower` は **1** にしてから実行してください。2 のままだと
+> `Robot ID 1 is out of range. Only 1 robots connected.` というエラーになります。
+> 実機（2台構成）では 2 のままで動きます。
 
 目標角度から離れたところ（例: `目標角度にうごかす ロボット [1] 関節 [1] 角度 [-30]`）から始めると、
 目標に近づいたあと **振動し続けて止まらない** のが見えます。
@@ -110,7 +120,7 @@ XML からブロックの JavaScript を取り出して Node で実行します�
 
 ```bash
 cd ~/snap_phosphobot/sim/harness
-python3 extract_blocks.py ../../template/test2.xml ./blocks.json
+python3 extract_blocks.py ../../template/test0.xml ./blocks.json
 PB_URL=http://127.0.0.1:8021 node test_blocks.js ./blocks.json
 ```
 
