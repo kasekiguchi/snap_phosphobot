@@ -1,9 +1,9 @@
-// template/test2.xml のカスタムブロックを、phosphobot（シミュレーション）に対してそのまま実行する。
+// template/test0.xml のカスタムブロックを、phosphobot（シミュレーション）に対してそのまま実行する。
 const { load, vars } = require("./snaprun.js");
 
 const BASE = process.env.PB_URL || "http://127.0.0.1:8021";
 const ROBOT = Number(process.env.PB_ROBOT || 1);
-const api = load(process.argv[2] || "./blocks_test2.json", BASE);
+const api = load(process.argv[2] || "./blocks_test0.json", BASE);
 
 const B = {
   status: api["statusを読む"],
@@ -68,8 +68,8 @@ check("不正な方向はエラー", () => {
   throw new Error("エラーにならなかった");
 });
 
-console.log("\n[5] test2.xml の ON-OFF 制御ループ（目標角度=0, 0.2秒ずつ）");
-const SEC = Number(process.env.ONOFF_SEC || 0.2);
+console.log("\n[5] test0.xml の ON-OFF 制御ループ（目標角度=0, 0.4秒ずつ）");
+const SEC = Number(process.env.ONOFF_SEC || 0.4);
 const N = Number(process.env.ONOFF_N || 25);
 try {
   B.writeAngle(ROBOT, 1, -25); // わざと目標から離しておく
