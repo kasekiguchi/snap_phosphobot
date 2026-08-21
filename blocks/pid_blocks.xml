@@ -690,7 +690,7 @@ return "";
     <inputs>
       <input type="%n">1</input>
       <input type="%n">1</input>
-      <input type="%n">0.2</input>
+      <input type="%n">0.4</input>
     </inputs>
     <script>
       <block s="doRun">
