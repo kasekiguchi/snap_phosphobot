@@ -28,7 +28,7 @@ return "";
       </block>
     </script>
   </block-definition>
-  <block-definition s="phosphobotの状態を読む" type="reporter" category="phosphobot">
+  <block-definition s="statusを読む" type="reporter" category="phosphobot">
     <header></header>
     <code></code>
     <translations></translations>
@@ -125,8 +125,8 @@ return "";
       </block>
     </script>
   </block-definition>
-  <block-definition s="ロボット %&apos;robot&apos; の力を抜く前の姿勢を覚える 角度 %&apos;angles&apos;" type="command" category="phosphobot">
-    <comment w="320" collapsed="false">「力をゆっくり抜く」で使う姿勢（6関節ぶん・度）をロボットごとに覚えます。角度の欄には「全関節角度を読む ロボット (n)」ブロックをそのままはめ込めます（カンマ区切りの数値やリストでもOK）。空にすると設定を消して初期値に戻ります。</comment>
+  <block-definition s="ロボット %&apos;robot&apos; の脱力する前の姿勢を覚える 角度 %&apos;angles&apos;" type="command" category="phosphobot">
+    <comment w="320" collapsed="false">「安全に脱力する」で使う姿勢（6関節ぶん・度）をロボットごとに覚えます。角度の欄には「全関節角度を読む ロボット (n)」ブロックをそのままはめ込めます（カンマ区切りの数値やリストでもOK）。空にすると設定を消して初期値に戻ります。</comment>
     <header></header>
     <code></code>
     <translations></translations>
@@ -192,8 +192,8 @@ return "";
       </block>
     </script>
   </block-definition>
-  <block-definition s="ロボット %&apos;robot&apos; の力をゆっくり抜く" type="command" category="phosphobot">
-    <comment w="320" collapsed="false">覚えておいた姿勢へ移動してから、モーターの力を抜きます。姿勢は「力を抜く前の姿勢を覚える」でそのロボットに設定した値（未設定なら初期値）を使います。</comment>
+  <block-definition s="安全に脱力する ロボット %&apos;robot&apos;" type="command" category="phosphobot">
+    <comment w="320" collapsed="false">覚えておいた姿勢へ移動してから、モーターの力を抜きます。姿勢は「脱力する前の姿勢を覚える」でそのロボットに設定した値（未設定なら初期値）を使います。</comment>
     <header></header>
     <code></code>
     <translations></translations>
@@ -227,7 +227,7 @@ var xhr = new XMLHttpRequest();
 xhr.open("POST", base(this) + "/joints/write?robot_id=" + rid, false);
 xhr.setRequestHeader("Content-Type", "application/json");
 xhr.send(JSON.stringify({angles: pose.map(deg2mu), unit: "motor_units"}));
-if (xhr.status &lt; 200 || xhr.status &gt;= 300) { throw new Error("/joints/write HTTP " + xhr.status + " (robot_id=" + rid + "): " + xhr.responseText + " ※このロボットに合う姿勢を「力を抜く前の姿勢を覚える」で覚えさせてください。"); }
+if (xhr.status &lt; 200 || xhr.status &gt;= 300) { throw new Error("/joints/write HTTP " + xhr.status + " (robot_id=" + rid + "): " + xhr.responseText + " ※このロボットに合う姿勢を「脱力する前の姿勢を覚える」で覚えさせてください。"); }
 var wait = Date.now() + 2000; while (Date.now() &lt; wait) {}
 var xhr2 = new XMLHttpRequest();
 xhr2.open("POST", base(this) + "/torque/toggle?robot_id=" + rid, false);
@@ -361,7 +361,7 @@ return "";
       </block>
     </script>
   </block-definition>
-  <block-definition s="関節角度を読む ロボット %&apos;robot&apos; 関節番号 %&apos;joint&apos;" type="reporter" category="phosphobot">
+  <block-definition s="ロボット %&apos;robot&apos; の関節 %&apos;joint&apos; の角度" type="reporter" category="phosphobot">
     <header></header>
     <code></code>
     <translations></translations>
@@ -585,13 +585,13 @@ return "";
     </script>
   </block-definition>
   <block-definition s="ロボット %&apos;robot&apos; の関節をまとめて動かす 指定 %&apos;pairs&apos;" type="command" category="phosphobot">
-    <comment w="320" collapsed="false">動かしたい関節だけを「関節番号,角度」の組で並べます（例: 1,30  3,-20  5,10）。書かなかった関節は今の角度のままです。区切りはカンマでも空白でもかまいません。</comment>
+    <comment w="320" collapsed="false">動かしたい関節だけを「関節番号:角度」の組で並べます（例: 1:30, 3:-20, 5:10）。関節番号と角度はコロン、組と組はカンマで区切ります。書かなかった関節は今の角度のままです。</comment>
     <header></header>
     <code></code>
     <translations></translations>
     <inputs>
       <input type="%n">1</input>
-      <input type="%s">2,-90  3,90</input>
+      <input type="%s">2:-90, 3:90</input>
     </inputs>
     <script>
       <block s="doRun">
@@ -617,15 +617,15 @@ function flatten(v, out) {
     a.forEach(function (x) { flatten(x, out); });
     return out;
   }
-  String(v).replace(/[\[\]]/g, " ").split(/[\s,;]+/).forEach(function (t) {
+  String(v).replace(/[\[\]]/g, " ").split(/[\s,;:]+/).forEach(function (t) {
     if (t !== "") { out.push(t); }
   });
   return out;
 }
 var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
 var flat = flatten(pairs, []);
-if (flat.length === 0) { throw new Error("「関節番号,角度」の組を指定してください。例: 1,30  3,-20"); }
-if (flat.length % 2 !== 0) { throw new Error("「関節番号,角度」の組で指定してください（数が合っていません）。例: 1,30  3,-20"); }
+if (flat.length === 0) { throw new Error("「関節番号:角度」の組を指定してください。例: 1:30, 3:-20"); }
+if (flat.length % 2 !== 0) { throw new Error("「関節番号:角度」の組で指定してください（数が合っていません）。例: 1:30, 3:-20"); }
 var want = [];
 for (var i = 0; i &lt; flat.length; i += 2) {
   var jn = parseInt(flat[i], 10);
@@ -895,7 +895,7 @@ var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
 var xhr = new XMLHttpRequest();
 xhr.open("POST", base(this) + "/end-effector/read?robot_id=" + rid, false);
 xhr.setRequestHeader("Content-Type", "application/json");
-xhr.send("{}");
+xhr.send(JSON.stringify({sync: true}));
 if (xhr.status &lt; 200 || xhr.status &gt;= 300) { throw new Error("/end-effector/read HTTP " + xhr.status + ": " + xhr.responseText); }
 var data = JSON.parse(xhr.responseText || "{}");
 try { this.variables.setVar("last_response", JSON.stringify(data)); } catch (e) {}
