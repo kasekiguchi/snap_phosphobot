@@ -28,7 +28,7 @@ return "";
       </block>
     </script>
   </block-definition>
-  <block-definition s="statusを読む" type="reporter" category="phosphobot">
+  <block-definition s="phosphobotの状態を読む" type="reporter" category="phosphobot">
     <header></header>
     <code></code>
     <translations></translations>
@@ -125,8 +125,8 @@ return "";
       </block>
     </script>
   </block-definition>
-  <block-definition s="脱力の安全角度を設定する ロボット %&apos;robot&apos; 角度 %&apos;angles&apos;" type="command" category="phosphobot">
-    <comment w="320" collapsed="false">「安全に脱力する」で使う安全角度（6関節ぶん・度）をロボットごとに設定します。角度の欄には「全関節角度を読む ロボット (n)」ブロックをそのままはめ込めます（カンマ区切りの数値やリストでもOK）。空にすると設定を消して初期値に戻ります。</comment>
+  <block-definition s="ロボット %&apos;robot&apos; の力を抜く前の姿勢を覚える 角度 %&apos;angles&apos;" type="command" category="phosphobot">
+    <comment w="320" collapsed="false">「力をゆっくり抜く」で使う姿勢（6関節ぶん・度）をロボットごとに覚えます。角度の欄には「全関節角度を読む ロボット (n)」ブロックをそのままはめ込めます（カンマ区切りの数値やリストでもOK）。空にすると設定を消して初期値に戻ります。</comment>
     <header></header>
     <code></code>
     <translations></translations>
@@ -175,7 +175,7 @@ if (deg.length === 0) {
   try { this.variables.setVar("safe_pose", ""); } catch (e) {}
   return "";
 }
-if (deg.length !== 6) { throw new Error("安全角度は6関節ぶん（6つの数値・度）で指定してください。受け取った個数: " + deg.length + "。「全関節角度を読む ロボット (n)」ブロックを角度の欄にはめ込むか、カンマ区切りで6つ入力してください。"); }
+if (deg.length !== 6) { throw new Error("姿勢は6関節ぶん（6つの数値・度）で指定してください。受け取った個数: " + deg.length + "。「全関節角度を読む ロボット (n)」ブロックを角度の欄にはめ込むか、カンマ区切りで6つ入力してください。"); }
 for (var i = 0; i &lt; 6; i += 1) {
   if (!isFinite(deg[i])) { throw new Error("関節" + (i + 1) + "の角度が数値ではありません。キャリブレーション前だと「全関節角度を読む」がnullを返すことがあります。"); }
 }
@@ -192,8 +192,8 @@ return "";
       </block>
     </script>
   </block-definition>
-  <block-definition s="安全に脱力する ロボット %&apos;robot&apos;" type="command" category="phosphobot">
-    <comment w="320" collapsed="false">安全な角度に移動してからトルクOFF（脱力）します。角度は「脱力の安全角度を設定する」でそのロボットに設定した値（未設定なら初期値）を使います。</comment>
+  <block-definition s="ロボット %&apos;robot&apos; の力をゆっくり抜く" type="command" category="phosphobot">
+    <comment w="320" collapsed="false">覚えておいた姿勢へ移動してから、モーターの力を抜きます。姿勢は「力を抜く前の姿勢を覚える」でそのロボットに設定した値（未設定なら初期値）を使います。</comment>
     <header></header>
     <code></code>
     <translations></translations>
@@ -227,7 +227,7 @@ var xhr = new XMLHttpRequest();
 xhr.open("POST", base(this) + "/joints/write?robot_id=" + rid, false);
 xhr.setRequestHeader("Content-Type", "application/json");
 xhr.send(JSON.stringify({angles: pose.map(deg2mu), unit: "motor_units"}));
-if (xhr.status &lt; 200 || xhr.status &gt;= 300) { throw new Error("/joints/write HTTP " + xhr.status + " (robot_id=" + rid + "): " + xhr.responseText + " ※このロボットに合う角度を「脱力の安全角度を設定する」で設定してください。"); }
+if (xhr.status &lt; 200 || xhr.status &gt;= 300) { throw new Error("/joints/write HTTP " + xhr.status + " (robot_id=" + rid + "): " + xhr.responseText + " ※このロボットに合う姿勢を「力を抜く前の姿勢を覚える」で覚えさせてください。"); }
 var wait = Date.now() + 2000; while (Date.now() &lt; wait) {}
 var xhr2 = new XMLHttpRequest();
 xhr2.open("POST", base(this) + "/torque/toggle?robot_id=" + rid, false);
@@ -445,7 +445,7 @@ return JSON.stringify(degs);
       </block>
     </script>
   </block-definition>
-  <block-definition s="目標角度にうごかす ロボット %&apos;robot&apos; 関節 %&apos;joint&apos; 角度 %&apos;angle&apos;" type="command" category="phosphobot">
+  <block-definition s="ロボット %&apos;robot&apos; の関節 %&apos;joint&apos; を %&apos;angle&apos; 度にする" type="command" category="phosphobot">
     <header></header>
     <code></code>
     <translations></translations>
@@ -497,6 +497,163 @@ return "";
           <block var="robot" />
           <block var="joint" />
           <block var="angle" />
+        </list>
+      </block>
+    </script>
+  </block-definition>
+  <block-definition s="ロボット %&apos;robot&apos; の全関節を 角度 %&apos;angles&apos; にする" type="command" category="phosphobot">
+    <comment w="320" collapsed="false">6つの関節をまとめて指定した角度（度）にします。「全関節角度を読む」の結果をそのままはめ込めます。空欄にした関節は今の角度のままです（例: 0, , , , , 30 なら関節1と関節6だけ動きます）。</comment>
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs>
+      <input type="%n">1</input>
+      <input type="%s">0, -90, 90, -90, 0, 0</input>
+    </inputs>
+    <script>
+      <block s="doRun">
+        <block s="reportJSFunction">
+          <list>
+            <l>robot</l>
+            <l>angles</l>
+          </list>
+          <l>
+function base(ctx) {
+  try { var v = ctx.variables.getVar("phosphobot_url"); if (v) return String(v).replace(/\/$/, ""); } catch (e) {}
+  if (window.phosphobot_url) return String(window.phosphobot_url).replace(/\/$/, "");
+  try { var ls = localStorage.getItem("phosphobot_url"); if (ls) return String(ls).replace(/\/$/, ""); } catch (e) {}
+  return "http://127.0.0.1:8021";
+}
+function deg2mu(d) { return Math.round(Number(d) * 4096 / 360 + 2048); }
+function cell(x) {
+  if (x &amp;&amp; typeof x === "object" &amp;&amp; typeof x.itemsArray === "function") {
+    var t = x.itemsArray();
+    x = t.length ? t[0] : "";
+  }
+  var c = (x === null || x === undefined) ? "" : String(x).trim();
+  if (c === "" || c === "-" || c === "null") { return null; }
+  var num = Number(c);
+  if (!isFinite(num)) { throw new Error("角度は数値で指定してください。読めなかった値: " + c); }
+  return num;
+}
+function toCells(v) {
+  if (v === null || v === undefined) { return []; }
+  var a;
+  if (typeof v === "object") {
+    if (typeof v.itemsArray === "function") { a = v.itemsArray(); }
+    else if (Array.isArray(v)) { a = v; }
+    else if (typeof v.asArray === "function") { a = v.asArray(); }
+    else if (v.contents) { a = v.contents; }
+    else { a = []; }
+  } else {
+    var s = String(v).trim().replace(/^\[|\]$/g, "");
+    if (s.trim() === "") { return []; }
+    a = s.split(",");
+  }
+  return a.map(cell);
+}
+var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
+var cells = toCells(angles);
+if (cells.length === 0) { throw new Error("角度を1〜6個、カンマ区切りで指定してください。例: 0, -90, 90, -90, 0, 0"); }
+if (cells.length &gt; 6) { throw new Error("角度は6個までです。受け取った個数: " + cells.length); }
+var r = new XMLHttpRequest();
+r.open("POST", base(this) + "/joints/read?robot_id=" + rid, false);
+r.setRequestHeader("Content-Type", "application/json");
+r.send(JSON.stringify({source: "robot", unit: "motor_units"}));
+if (r.status &lt; 200 || r.status &gt;= 300) { throw new Error("/joints/read HTTP " + r.status + ": " + r.responseText); }
+var mu = (JSON.parse(r.responseText || "{}").angles || []).map(function (a) { return Math.round(Number(a)); });
+if (mu.length &lt; 6 || mu.some(function (n) { return !isFinite(n); })) { throw new Error("関節角度を読めませんでした(null)。キャリブレーションが済んでいるか、ロボット番号が合っているか確認してください。"); }
+var moved = 0;
+for (var i = 0; i &lt; cells.length; i += 1) {
+  if (cells[i] !== null) { mu[i] = deg2mu(cells[i]); moved += 1; }
+}
+if (moved === 0) { return ""; }
+var xhr = new XMLHttpRequest();
+xhr.open("POST", base(this) + "/joints/write?robot_id=" + rid, false);
+xhr.setRequestHeader("Content-Type", "application/json");
+xhr.send(JSON.stringify({angles: mu, unit: "motor_units"}));
+if (xhr.status &lt; 200 || xhr.status &gt;= 300) { throw new Error("/joints/write HTTP " + xhr.status + " (robot_id=" + rid + "): " + xhr.responseText); }
+try { this.variables.setVar("last_response", xhr.responseText || "{}"); } catch (e) {}
+return "";
+        </l>
+        </block>
+        <list>
+          <block var="robot" />
+          <block var="angles" />
+        </list>
+      </block>
+    </script>
+  </block-definition>
+  <block-definition s="ロボット %&apos;robot&apos; の関節をまとめて動かす 指定 %&apos;pairs&apos;" type="command" category="phosphobot">
+    <comment w="320" collapsed="false">動かしたい関節だけを「関節番号,角度」の組で並べます（例: 1,30  3,-20  5,10）。書かなかった関節は今の角度のままです。区切りはカンマでも空白でもかまいません。</comment>
+    <header></header>
+    <code></code>
+    <translations></translations>
+    <inputs>
+      <input type="%n">1</input>
+      <input type="%s">2,-90  3,90</input>
+    </inputs>
+    <script>
+      <block s="doRun">
+        <block s="reportJSFunction">
+          <list>
+            <l>robot</l>
+            <l>pairs</l>
+          </list>
+          <l>
+function base(ctx) {
+  try { var v = ctx.variables.getVar("phosphobot_url"); if (v) return String(v).replace(/\/$/, ""); } catch (e) {}
+  if (window.phosphobot_url) return String(window.phosphobot_url).replace(/\/$/, "");
+  try { var ls = localStorage.getItem("phosphobot_url"); if (ls) return String(ls).replace(/\/$/, ""); } catch (e) {}
+  return "http://127.0.0.1:8021";
+}
+function deg2mu(d) { return Math.round(Number(d) * 4096 / 360 + 2048); }
+function flatten(v, out) {
+  if (v === null || v === undefined) { return out; }
+  if (typeof v === "object") {
+    var a = (typeof v.itemsArray === "function") ? v.itemsArray()
+          : (Array.isArray(v) ? v
+          : (typeof v.asArray === "function" ? v.asArray() : (v.contents || [])));
+    a.forEach(function (x) { flatten(x, out); });
+    return out;
+  }
+  String(v).replace(/[\[\]]/g, " ").split(/[\s,;]+/).forEach(function (t) {
+    if (t !== "") { out.push(t); }
+  });
+  return out;
+}
+var rid = Math.max(1, parseInt(robot, 10) || 1) - 1;
+var flat = flatten(pairs, []);
+if (flat.length === 0) { throw new Error("「関節番号,角度」の組を指定してください。例: 1,30  3,-20"); }
+if (flat.length % 2 !== 0) { throw new Error("「関節番号,角度」の組で指定してください（数が合っていません）。例: 1,30  3,-20"); }
+var want = [];
+for (var i = 0; i &lt; flat.length; i += 2) {
+  var jn = parseInt(flat[i], 10);
+  var deg = Number(flat[i + 1]);
+  if (!(jn &gt;= 1 &amp;&amp; jn &lt;= 6)) { throw new Error("関節番号は 1〜6 で指定してください。受け取った値: " + flat[i]); }
+  if (!isFinite(deg)) { throw new Error("角度は数値で指定してください。読めなかった値: " + flat[i + 1]); }
+  want.push([jn - 1, deg]);
+}
+var r = new XMLHttpRequest();
+r.open("POST", base(this) + "/joints/read?robot_id=" + rid, false);
+r.setRequestHeader("Content-Type", "application/json");
+r.send(JSON.stringify({source: "robot", unit: "motor_units"}));
+if (r.status &lt; 200 || r.status &gt;= 300) { throw new Error("/joints/read HTTP " + r.status + ": " + r.responseText); }
+var mu = (JSON.parse(r.responseText || "{}").angles || []).map(function (a) { return Math.round(Number(a)); });
+if (mu.length &lt; 6 || mu.some(function (n) { return !isFinite(n); })) { throw new Error("関節角度を読めませんでした(null)。キャリブレーションが済んでいるか、ロボット番号が合っているか確認してください。"); }
+want.forEach(function (w) { mu[w[0]] = deg2mu(w[1]); });
+var xhr = new XMLHttpRequest();
+xhr.open("POST", base(this) + "/joints/write?robot_id=" + rid, false);
+xhr.setRequestHeader("Content-Type", "application/json");
+xhr.send(JSON.stringify({angles: mu, unit: "motor_units"}));
+if (xhr.status &lt; 200 || xhr.status &gt;= 300) { throw new Error("/joints/write HTTP " + xhr.status + " (robot_id=" + rid + "): " + xhr.responseText); }
+try { this.variables.setVar("last_response", xhr.responseText || "{}"); } catch (e) {}
+return "";
+        </l>
+        </block>
+        <list>
+          <block var="robot" />
+          <block var="pairs" />
         </list>
       </block>
     </script>
@@ -669,7 +826,7 @@ return "";
       </block>
     </script>
   </block-definition>
-  <block-definition s="止まれ ロボット %&apos;robot&apos;" type="command" category="phosphobot">
+  <block-definition s="ロボット %&apos;robot&apos; をその場で止める" type="command" category="phosphobot">
     <comment w="240" collapsed="false">現在角度を読み、同じ角度を書き戻す保持停止。ハードウェア非常停止ではありません。</comment>
     <header></header>
     <code></code>
@@ -842,7 +999,7 @@ return "";
       </block>
     </script>
   </block-definition>
-  <block-definition s="グリッパー ロボット %&apos;robot&apos; 開閉 %&apos;open&apos;" type="command" category="phosphobot">
+  <block-definition s="ロボット %&apos;robot&apos; のグリッパーを %&apos;open&apos; にする" type="command" category="phosphobot">
     <header></header>
     <code></code>
     <translations></translations>
