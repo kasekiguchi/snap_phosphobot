@@ -9,7 +9,7 @@ const B = {
   status: api["statusを読む"],
   count: api["ロボット台数"],
   readJoint: api["ロボット %'robot' の関節 %'joint' の角度"],
-  readAll: api["全関節角度を読む ロボット %'robot'"],
+  readAll: api["ロボット %'robot' の全関節の角度"],
   writeAngle: api["ロボット %'robot' の関節 %'joint' を %'angle' 度にする"],
   writeAll: api["ロボット %'robot' の全関節を 角度 %'angles' にする"],
   writePairs: api["ロボット %'robot' の関節をまとめて動かす 指定 %'pairs'"],
@@ -43,7 +43,7 @@ check("statusを読む", () => JSON.parse(B.status()).status || "(no status fiel
 check("ロボット台数", () => B.count());
 
 console.log("\n[2] 読み取り");
-check("全関節角度を読む", () => B.readAll());
+check("全関節の角度", () => B.readAll());
 check("関節角度を読む 関節1", () => f1(B.readJoint(ROBOT, 1)));
 
 console.log("\n[3] 関節を指定した角度にする（関節1を 20 度へ）");

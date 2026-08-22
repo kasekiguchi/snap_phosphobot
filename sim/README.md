@@ -45,7 +45,7 @@ phosphobot は `--only-simulation` だと仮想アームを1台しか作りま�
 ブラウザで Snap! を開き、いつもどおり `template/GiC_template.xml` を読み込んで:
 
 ```text
-phosphobot URLを [http://127.0.0.1:8021] にする
+ロボットの接続先を [http://127.0.0.1:8021] にする
 ```
 
 Windows 側のブラウザからでも、WSL2 のポートは `127.0.0.1` で見えます。
