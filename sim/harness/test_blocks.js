@@ -6,17 +6,19 @@ const ROBOT = Number(process.env.PB_ROBOT || 1);
 const api = load(process.argv[2] || "./blocks_test0.json", BASE);
 
 const B = {
-  status: api["statusを読む"],
+  status: api["phosphobotの状態を読む"],
   count: api["ロボット台数"],
   readJoint: api["関節角度を読む ロボット %'robot' 関節番号 %'joint'"],
   readAll: api["全関節角度を読む ロボット %'robot'"],
-  writeAngle: api["目標角度にうごかす ロボット %'robot' 関節 %'joint' 角度 %'angle'"],
+  writeAngle: api["ロボット %'robot' の関節 %'joint' を %'angle' 度にする"],
+  writeAll: api["ロボット %'robot' の全関節を 角度 %'angles' にする"],
+  writePairs: api["ロボット %'robot' の関節をまとめて動かす 指定 %'pairs'"],
   setDir: api["関節 %'joint' の回転方向を %'dir' にする"],
   moveSec: api["ロボット %'robot' の関節 %'joint' を %'seconds' 秒動かす"],
   home: api["ホームに戻る ロボット %'robot'"],
-  stop: api["止まれ ロボット %'robot'"],
-  setSafe: api["脱力の安全角度を設定する ロボット %'robot' 角度 %'angles'"],
-  relax: api["安全に脱力する ロボット %'robot'"],
+  stop: api["ロボット %'robot' をその場で止める"],
+  setSafe: api["ロボット %'robot' の力を抜く前の姿勢を覚える 角度 %'angles'"],
+  relax: api["ロボット %'robot' の力をゆっくり抜く"],
   setGains: api["ゲインを設定する P %'p' I %'i' D %'d'"],
   pidStep: api["PIDで ロボット %'robot' 関節 %'joint' を目標角度 %'target' へ一歩うごかす dt秒 %'dt'"],
 };
@@ -37,14 +39,14 @@ const f1 = (x) => (x === null || x === undefined ? String(x) : Number(x).toFixed
 console.log(`base=${BASE} robot=${ROBOT}\n`);
 
 console.log("[1] 接続確認");
-check("statusを読む", () => JSON.parse(B.status()).status || "(no status field)");
+check("phosphobotの状態を読む", () => JSON.parse(B.status()).status || "(no status field)");
 check("ロボット台数", () => B.count());
 
 console.log("\n[2] 読み取り");
 check("全関節角度を読む", () => B.readAll());
 check("関節角度を読む 関節1", () => f1(B.readJoint(ROBOT, 1)));
 
-console.log("\n[3] 目標角度にうごかす（関節1を 20 度へ）");
+console.log("\n[3] 関節を指定した角度にする（関節1を 20 度へ）");
 check("write 20deg", () => { B.writeAngle(ROBOT, 1, 20); return "sent"; });
 check("読み戻し", () => f1(B.readJoint(ROBOT, 1)));
 
@@ -98,9 +100,40 @@ try {
   fail++;
 }
 
-console.log("\n[6] 脱力まわり");
-check("安全角度を設定（現在姿勢）", () => { B.setSafe(ROBOT, B.readAll(ROBOT)); return vars.safe_pose; });
-check("安全に脱力する", () => { B.relax(ROBOT); return "ok"; });
+console.log("\n[5b] 複数の角度をまとめて設定する");
+check("全関節を 0,-90,90,-90,0,0 に", () => {
+  B.writeAll(ROBOT, "0, -90, 90, -90, 0, 0");
+  return B.readAll(ROBOT);
+});
+check("空欄の関節はそのまま（関節1と6だけ 30 に）", () => {
+  const before = JSON.parse(B.readAll(ROBOT));
+  B.writeAll(ROBOT, "30, , , , , 30");
+  const after = JSON.parse(B.readAll(ROBOT));
+  const kept = [1, 2, 3, 4].every((i) => Math.abs(after[i] - before[i]) < 1.5);
+  if (!kept) { throw new Error("空欄の関節が動いてしまった: " + JSON.stringify(after)); }
+  return `関節1=${after[0].toFixed(1)} 関節6=${after[5].toFixed(1)} / 関節2-5は保持`;
+});
+check("読んだ姿勢をそのまま書き戻せる", () => {
+  B.writeAll(ROBOT, B.readAll(ROBOT));
+  return "ok";
+});
+check("ペア指定 2,-45  3,45", () => {
+  B.writePairs(ROBOT, "2,-45  3,45");
+  const a = JSON.parse(B.readAll(ROBOT));
+  return `関節2=${a[1].toFixed(1)} 関節3=${a[2].toFixed(1)}`;
+});
+check("ペアの数が合わないとエラー", () => {
+  try { B.writePairs(ROBOT, "1,30 3"); } catch (e) { return "throws: " + e.message.slice(0, 22) + "..."; }
+  throw new Error("エラーにならなかった");
+});
+check("関節番号が範囲外だとエラー", () => {
+  try { B.writePairs(ROBOT, "7,30"); } catch (e) { return "throws: " + e.message.slice(0, 22) + "..."; }
+  throw new Error("エラーにならなかった");
+});
+
+console.log("[6] 力を抜くまわり");
+check("力を抜く前の姿勢を覚える（現在姿勢）", () => { B.setSafe(ROBOT, B.readAll(ROBOT)); return vars.safe_pose; });
+check("力をゆっくり抜く", () => { B.relax(ROBOT); return "ok"; });
 
 console.log("\n[7] PID ブロック（比較用）");
 check("ゲイン設定 P=0.5", () => { B.setGains(0.5, 0, 0); return "ok"; });

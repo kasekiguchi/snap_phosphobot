@@ -37,7 +37,7 @@ SO-101ロボットアームを中学生向け体験教室で使えるように�
 
 - **読み書きとも、どちらのロボットでも可能**（`joints/write` は leader でも通る）
 - `関節角度を読む`、`全関節角度を読む`、`手先の位置を読む` → 両方
-- `目標角度にうごかす`（joints/write）、`PIDで...一歩うごかす`、`止まれ`、`安全に脱力する` → 両方
+- `関節を指定した角度にする`（joints/write）、`PIDで...一歩うごかす`、`その場で止める`、`力をゆっくり抜く` → 両方
 - `手先を絶対位置へ動かす`、`手先を相対移動する`、`グリッパー` → 両方（move/absolute, move/relative）
 - `ホームに戻る` → ロボット番号に関わらず**両方のアームが同時にホームに戻る**
 - `joints/read` が `null` を返すときは、そのロボットのキャリブレーションが済んでいない可能性が高い
@@ -100,24 +100,26 @@ PID教材に最低限必要なブロック:
 | ブロック | 役割 | エンドポイント |
 |---|---|---|
 | `phosphobot URLを (url) にする` | 接続先設定 | — |
-| `statusを読む` | サーバー状態確認 | GET /status |
+| `phosphobotの状態を読む` | サーバー状態確認 | GET /status |
 | `ロボット台数` | 接続台数取得 | GET /status |
 | `関節角度を読む ロボット (n) 関節番号 (n)` | 現在値取得（フィードバック） | POST /joints/read |
 | `全関節角度を読む ロボット (n)` | 全関節の現在値 | POST /joints/read |
-| `目標角度にうごかす ロボット (n) 関節 (n) 角度 (n)` | 制御入力（度数指定） | POST /joints/write |
+| `ロボット (n) の関節 (n) を (角度) 度にする` | 制御入力（度数指定） | POST /joints/write |
+| `ロボット (n) の全関節を 角度 (…) にする` | 6関節まとめて指定（空欄はそのまま） | POST /joints/read + /joints/write |
+| `ロボット (n) の関節をまとめて動かす 指定 (…)` | 「関節番号,角度」の組で複数関節を指定 | POST /joints/read + /joints/write |
 | `ゲインを設定する P (n) I (n) D (n)` | PIDパラメータ設定 | — (変数のみ) |
 | `PID出力を計算する 目標 (n) 現在 (n) dt秒 (n)` | PID計算 | — (変数のみ) |
 | `PIDで ロボット (n) 関節 (n) を目標角度 (n) へ一歩うごかす dt秒 (n)` | PID制御1ステップ | POST /joints/read + /joints/write |
-| `止まれ ロボット (n)` | 保持停止（現在角度書き戻し） | POST /joints/read + /joints/write |
+| `ロボット (n) をその場で止める` | 保持停止（現在角度書き戻し） | POST /joints/read + /joints/write |
 | `ホームに戻る ロボット (n)` | 初期位置へ（両アーム同時） | POST /move/init |
 | `手先の位置を読む ロボット (n)` | エンドエフェクター位置取得 | POST /end-effector/read |
 | `手先を絶対位置へ動かす ロボット (n) x y z` | 絶対位置指定（cm） | POST /move/absolute |
 | `手先を相対移動する ロボット (n) dx dy dz` | 差分移動（cm） | POST /move/relative |
-| `グリッパー ロボット (n) 開閉 (0-1)` | グリッパー開閉 | POST /move/relative |
+| `ロボット (n) のグリッパーを (0-1) にする` | グリッパー開閉 | POST /move/relative |
 | `関節 (n) の回転方向を (+/-) にする` | 手動操作の向き設定（関節ごと） | — (localStorage) |
 | `ロボット (n) の関節 (n) を (t) 秒動かす` | 一定速度30度/秒でt秒動かす（手動操作・ON-OFF制御用） | POST /joints/read + /joints/write |
-| `脱力の安全角度を設定する ロボット (n) 角度 (…)` | 脱力前の安全姿勢をロボットごとに保存（度・6関節） | — (localStorage) |
-| `安全に脱力する ロボット (n)` | 安全姿勢へ移動してトルクOFF | POST /joints/write + /torque/toggle |
+| `ロボット (n) の力を抜く前の姿勢を覚える 角度 (…)` | 脱力前の安全姿勢をロボットごとに保存（度・6関節） | — (localStorage) |
+| `ロボット (n) の力をゆっくり抜く` | 安全姿勢へ移動してトルクOFF | POST /joints/write + /torque/toggle |
 
 Snap!のHTTP実装方針:
 
