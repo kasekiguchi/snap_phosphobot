@@ -10,9 +10,11 @@ set -uo pipefail
 VENV="${VENV:-$HOME/pbsim}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 LOG="${LOG:-$HOME/pbsim_logs}"
+SIM_ROBOTS="${SIM_ROBOTS:-2}"   # 実機と同じ leader/follower の2台構成にする
 mkdir -p "$LOG"
 
 stop() {
+  pkill -f "phosphobot_sim\.py" 2>/dev/null
   pkill -f "phosphobot run" 2>/dev/null
   pkill -f "cors_proxy\.py" 2>/dev/null
   sleep 1
@@ -26,8 +28,8 @@ fi
 
 stop
 
-echo "=== phosphobot (simulation only)"
-nohup "$VENV/bin/phosphobot" run \
+echo "=== phosphobot (simulation only, ${SIM_ROBOTS} robots)"
+nohup env SIM_ROBOTS="$SIM_ROBOTS" "$VENV/bin/python" "$REPO/sim/phosphobot_sim.py" run \
   --only-simulation --simulation headless \
   --port 8020 --no-realsense --no-can --no-telemetry \
   > "$LOG/phosphobot.log" 2>&1 &
@@ -51,5 +53,5 @@ done
 echo "--- 8021 /status (Snap! はここに繋ぐ) ---"
 curl -s -m 5 http://localhost:8021/status; echo
 echo
-echo "3D で見る:  \$HOME/pbsim/bin/python sim/viewer.py"
+echo "3D で見る:  bash sim/view.sh"
 echo "止める:     bash sim/run.sh stop"

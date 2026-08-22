@@ -29,8 +29,14 @@ bash sim/setup.sh
 bash sim/run.sh
 ```
 
-- `phosphobot run --only-simulation` を 8020 で起動（USBを一切見ないので実機不要）
+- `sim/phosphobot_sim.py` 経由で `phosphobot run --only-simulation` を 8020 で起動（USBを一切見ないので実機不要）
 - `proxy/cors_proxy.py` を 8021 で起動
+
+phosphobot は `--only-simulation` だと仮想アームを1台しか作りません
+（`robot.py` の `_find_robots()` が `[SO100Hardware(only_simulation=True)]` 固定）。
+それだと実機の leader/follower 2台構成を再現できないので、`sim/phosphobot_sim.py` が
+`_find_robots()` の後ろに台数ぶんの仮想アームを足してから CLI を起動します。
+既定は2台で、`SIM_ROBOTS` で変えられます。
 
 `{"status":"ok", ... "robots":["so-100"] ...}` が表示されれば成功です。止めるときは `bash sim/run.sh stop`。
 
@@ -43,7 +49,8 @@ phosphobot URLを [http://127.0.0.1:8021] にする
 ```
 
 Windows 側のブラウザからでも、WSL2 のポートは `127.0.0.1` で見えます。
-シミュレーションのロボットは **1台だけ**なので、ブロックの `ロボット` は必ず **1**（`robot_id=0`）にしてください。
+仮想アームは実機と同じく **2台** 立ち上がるので、ブロックの `ロボット` は **1**（leader / `robot_id=0`）と
+**2**（follower / `robot_id=1`）のどちらも使えます。台数を変えたいときは `SIM_ROBOTS=3 bash sim/run.sh` のように指定します。
 
 ## 4. 3D で見る
 
@@ -81,7 +88,7 @@ PB_URL=http://127.0.0.1:8021 node test_blocks.js ./blocks.json
 
 | 項目 | シミュレーション | 備考 |
 |---|---|---|
-| ロボット台数 | 1台（`robot_id=0` = ブロックの「ロボット 1」） | leader/follower の2台構成は再現できない |
+| ロボット台数 | 2台（`SIM_ROBOTS` で変更可） | `sim/phosphobot_sim.py` で台数ぶん生成している |
 | `目標角度にうごかす` | 単独関節なら誤差 0.12度以内 | 実機同様に使える |
 | `ロボット1の関節1を1秒動かす` | +29.9度（設計値 30度/秒） | 実機でも同じ計算式 |
 | 姿勢を変えたあとの精度 | **重力で最大14度たれる** | 下記参照 |
